@@ -1,5 +1,3 @@
-
-
 import 'dart:async';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -7,10 +5,12 @@ import 'package:stopwatch/features/stopwatch/service/stopwatch_service.dart';
 
 part 'stopwatch_state.dart';
 
-final NotifierProvider<StopwatchNotifier, StopwatchState> stopwatchNotifierProvider = NotifierProvider<StopwatchNotifier, StopwatchState>(StopwatchNotifier.new);
+final NotifierProvider<StopwatchNotifier, StopwatchState>
+stopwatchNotifierProvider = NotifierProvider<StopwatchNotifier, StopwatchState>(
+  StopwatchNotifier.new,
+);
 
 class StopwatchNotifier extends Notifier<StopwatchState> {
-
   Timer? _timer;
   late final StopwatchService _stopwatchService;
 
@@ -33,7 +33,10 @@ class StopwatchNotifier extends Notifier<StopwatchState> {
   void pause() {
     _stopwatchService.stop();
     _timer?.cancel();
-    state = state.copyWith(isRunning: false);
+    state = state.copyWith(
+      isRunning: false,
+      elapsed: _stopwatchService.elapsedTime,
+    );
   }
 
   void reset() {
@@ -46,4 +49,4 @@ class StopwatchNotifier extends Notifier<StopwatchState> {
   void _updateElapsed(_) {
     state = state.copyWith(elapsed: _stopwatchService.elapsedTime);
   }
- }
+}

@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:stopwatch/features/stopwatch/view/widgets/stopwatch_controls.dart';
+import 'package:stopwatch/features/stopwatch/view/widgets/stopwatch_display.dart';
 
 class StopwatchScreen extends StatelessWidget {
   const new({super.key});
@@ -7,7 +9,12 @@ class StopwatchScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text("Stopwatch"), centerTitle: true),
-      body: const Center(child: Center(child: Text("Stopwatch"))),
+      body: Center(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [StopwatchDisplay(), StopwatchControls()],
+        ),
+      ),
     );
   }
 }

@@ -1,6 +1,8 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-final Provider<StopwatchService> stopwatchServiceProvider = Provider((_) => StopwatchService());
+final Provider<StopwatchService> stopwatchServiceProvider = Provider(
+  (_) => StopwatchService(),
+);
 
 class StopwatchService {
   final Stopwatch _stopwatch = Stopwatch();

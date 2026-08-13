@@ -4,9 +4,13 @@ class StopwatchState {
   final Duration elapsed;
   final bool isRunning;
 
-  const StopwatchState({required this.elapsed, required this.isRunning});
+  const new({required this.elapsed, required this.isRunning});
 
-  StopwatchState.initial() : elapsed = Duration.zero, isRunning = false;
+  new initial() : elapsed = Duration.zero, isRunning = false;
+
+  bool get isPaused => elapsed > Duration.zero && !isRunning;
+
+  bool get isInitial => elapsed == Duration.zero && !isRunning;
 
   StopwatchState copyWith({Duration? elapsed, bool? isRunning}) {
     return StopwatchState(
@@ -22,6 +26,7 @@ class StopwatchState {
             elapsed == other.elapsed &&
             isRunning == other.isRunning;
   }
+
   @override
   int get hashCode => Object.hash(elapsed, isRunning);
 }
