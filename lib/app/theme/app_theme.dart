@@ -8,6 +8,12 @@ final ThemeData appTheme = ThemeData(
   scaffoldBackgroundColor: AppColors.background,
   colorScheme: .fromSeed(seedColor: AppColors.primary),
   brightness: Brightness.light,
+  appBarTheme:   const AppBarTheme(
+    backgroundColor: AppColors.background,
+    surfaceTintColor: Colors.transparent,
+    elevation: 0,
+    centerTitle: true,
+  ),
   filledButtonTheme: FilledButtonThemeData(
     style: ButtonStyle(
       shape: WidgetStatePropertyAll(RoundedRectangleBorder(borderRadius: BorderRadius.circular(10))),
