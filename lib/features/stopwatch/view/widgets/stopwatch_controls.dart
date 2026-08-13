@@ -17,14 +17,14 @@ class StopwatchControls extends ConsumerWidget {
       spacing: 10,
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        FilledButton(onPressed: () => notifier.start(), child: Text("Start")),
+        FilledButton(onPressed: state.isInitial ? () => notifier.start() : null, child: Text("Start")),
         FilledButton(
           onPressed: state.isInitial
               ? null
               : () => state.isPaused ? notifier.start() : notifier.pause(),
           child: Text(state.isPaused ? "Resume" : "Pause"),
         ),
-        FilledButton(onPressed: () => notifier.reset(), child: Text("Reset")),
+        FilledButton(onPressed: state.isInitial ? null :  () => notifier.reset(), child: Text("Reset")),
       ],
     );
   }
