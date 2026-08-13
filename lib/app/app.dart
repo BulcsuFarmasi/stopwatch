@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:stopwatch/app/theme/app_theme.dart';
 import 'package:stopwatch/features/stopwatch/view/stopwatch_screen.dart';
 
 class StopwatchApp extends StatelessWidget {
@@ -7,7 +8,7 @@ class StopwatchApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Stopwatch',
-      theme: ThemeData(colorScheme: .fromSeed(seedColor: Colors.deepPurple)),
+      theme: appTheme,
       home: StopwatchScreen(),
     );
   }
