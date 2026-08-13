@@ -6,7 +6,7 @@ class StopwatchApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Demo',
+      title: 'Stopwatch',
       theme: ThemeData(colorScheme: .fromSeed(seedColor: Colors.deepPurple)),
       home: StopwatchScreen(),
     );
