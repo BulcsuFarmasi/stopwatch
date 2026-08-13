@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:stopwatch/features/stopwatch/constants/stopwatch_constants.dart';
 import 'package:stopwatch/features/stopwatch/logic/stopwatch_notifier.dart';
 
 class StopwatchControls extends ConsumerWidget {
@@ -13,19 +14,35 @@ class StopwatchControls extends ConsumerWidget {
 
     final StopwatchState state = ref.watch(stopwatchNotifierProvider);
 
-    return Row(
-      spacing: 10,
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        FilledButton(onPressed: state.isInitial ? () => notifier.start() : null, child: Text("Start")),
-        FilledButton(
-          onPressed: state.isInitial
-              ? null
-              : () => state.isPaused ? notifier.start() : notifier.pause(),
-          child: Text(state.isPaused ? "Resume" : "Pause"),
-        ),
-        FilledButton(onPressed: state.isInitial ? null :  () => notifier.reset(), child: Text("Reset")),
-      ],
+    return ConstrainedBox(
+      constraints: BoxConstraints(maxWidth: StopwatchConstants.controlWidth),
+      child: Row(
+        spacing: StopwatchConstants.controlSpacing,
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Expanded(
+            child: FilledButton(
+              onPressed: state.isInitial ? () => notifier.start() : null,
+              child: Text("Start"),
+            ),
+          ),
+          Expanded(
+            child: FilledButton(
+              onPressed: state.isInitial
+                  ? null
+                  : () => state.isPaused ? notifier.start() : notifier.pause(),
+              child: Text(state.isPaused ? "Resume" : "Pause"),
+            ),
+          ),
+
+          Expanded(
+            child: FilledButton(
+              onPressed: state.isInitial ? null : () => notifier.reset(),
+              child: Text("Reset"),
+            ),
+          ),
+        ],
+      ),
     );
   }
 }
