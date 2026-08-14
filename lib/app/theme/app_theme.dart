@@ -4,7 +4,7 @@ import 'package:stopwatch/app/theme/app_text_themes.dart';
 
 final ThemeData appTheme = ThemeData(
   textTheme: appTextTheme,
-  fontFamily: 'RobotoCondsed',
+  fontFamily: 'RobotoCondensed',
   scaffoldBackgroundColor: AppColors.background,
   colorScheme: .fromSeed(seedColor: AppColors.primary),
   brightness: Brightness.light,
