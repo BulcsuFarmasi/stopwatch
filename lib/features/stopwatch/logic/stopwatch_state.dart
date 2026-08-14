@@ -2,20 +2,16 @@ part of 'stopwatch_notifier.dart';
 
 class StopwatchState {
   final Duration elapsed;
-  final bool isRunning;
+  final StopwatchStatus status;
 
-  const new({required this.elapsed, required this.isRunning});
+  const new({required this.elapsed, required this.status});
 
-  new initial() : elapsed = Duration.zero, isRunning = false;
+  new initial() : elapsed = Duration.zero, status = .initial;
 
-  bool get isPaused => elapsed > Duration.zero && !isRunning;
-
-  bool get isInitial => elapsed == Duration.zero && !isRunning;
-
-  StopwatchState copyWith({Duration? elapsed, bool? isRunning}) {
+  StopwatchState copyWith({Duration? elapsed, StopwatchStatus? status}) {
     return StopwatchState(
       elapsed: elapsed ?? this.elapsed,
-      isRunning: isRunning ?? this.isRunning,
+      status: status ?? this.status,
     );
   }
 
@@ -24,9 +20,11 @@ class StopwatchState {
     return identical(this, other) ||
         other is StopwatchState &&
             elapsed == other.elapsed &&
-            isRunning == other.isRunning;
+            status == other.status;
   }
 
   @override
-  int get hashCode => Object.hash(elapsed, isRunning);
+  int get hashCode => Object.hash(elapsed, status);
 }
+
+enum StopwatchStatus { initial, running, paused }

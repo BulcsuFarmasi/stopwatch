@@ -18,23 +18,26 @@ class StopwatchNotifier extends Notifier<StopwatchState> {
   StopwatchState build() {
     _stopwatchService = ref.read(stopwatchServiceProvider);
     ref.onDispose(() => _timer?.cancel());
-    return StopwatchState.initial();
+    return .initial();
   }
 
   void start() {
-    if (state.isRunning) {
+    if (state.status == .running) {
       return;
     }
     _stopwatchService.start();
     _timer = Timer.periodic(Duration(milliseconds: 30), _updateElapsed);
-    state = state.copyWith(isRunning: true);
+    state = state.copyWith(status: .running);
   }
 
   void pause() {
+    if (state.status != .running) {
+      return;
+    }
     _stopwatchService.stop();
     _timer?.cancel();
     state = state.copyWith(
-      isRunning: false,
+      status: .paused,
       elapsed: _stopwatchService.elapsedTime,
     );
   }
@@ -43,7 +46,7 @@ class StopwatchNotifier extends Notifier<StopwatchState> {
     _stopwatchService.stop();
     _stopwatchService.reset();
     _timer?.cancel();
-    state = StopwatchState(elapsed: Duration.zero, isRunning: false);
+    state = .initial();
   }
 
   void _updateElapsed(_) {

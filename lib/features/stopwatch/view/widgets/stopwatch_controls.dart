@@ -12,7 +12,12 @@ class StopwatchControls extends ConsumerWidget {
       stopwatchNotifierProvider.notifier,
     );
 
-    final StopwatchState state = ref.watch(stopwatchNotifierProvider);
+    final StopwatchStatus status = ref.watch(
+      stopwatchNotifierProvider.select((StopwatchState state) => state.status),
+    );
+
+    final bool isPaused = status == .paused;
+    final bool isInitial = status == .initial;
 
     return ConstrainedBox(
       constraints: BoxConstraints(maxWidth: StopwatchConstants.controlWidth),
@@ -22,22 +27,22 @@ class StopwatchControls extends ConsumerWidget {
         children: [
           Expanded(
             child: FilledButton(
-              onPressed: state.isInitial ? () => notifier.start() : null,
+              onPressed: isInitial ? () => notifier.start() : null,
               child: Text("Start"),
             ),
           ),
           Expanded(
             child: FilledButton(
-              onPressed: state.isInitial
+              onPressed: isInitial
                   ? null
-                  : () => state.isPaused ? notifier.start() : notifier.pause(),
-              child: Text(state.isPaused ? "Resume" : "Pause"),
+                  : () => isPaused ? notifier.start() : notifier.pause(),
+              child: Text(isPaused ? "Resume" : "Pause"),
             ),
           ),
 
           Expanded(
             child: FilledButton(
-              onPressed: state.isInitial ? null : () => notifier.reset(),
+              onPressed: isInitial ? null : () => notifier.reset(),
               child: Text("Reset"),
             ),
           ),
