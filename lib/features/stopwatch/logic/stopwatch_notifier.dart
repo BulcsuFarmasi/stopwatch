@@ -17,7 +17,11 @@ class StopwatchNotifier extends Notifier<StopwatchState> {
   @override
   StopwatchState build() {
     _stopwatchService = ref.read(stopwatchServiceProvider);
-    ref.onDispose(() => _timer?.cancel());
+    ref.onDispose(() {
+      _timer?.cancel();
+      _stopwatchService.stop();
+    });
+
     return .initial();
   }
 
