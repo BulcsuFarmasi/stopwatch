@@ -43,7 +43,6 @@ class StopwatchNotifier extends Notifier<StopwatchState> {
   }
 
   void reset() {
-    _stopwatchService.stop();
     _stopwatchService.reset();
     _timer?.cancel();
     state = .initial();

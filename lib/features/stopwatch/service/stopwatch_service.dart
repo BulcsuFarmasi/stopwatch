@@ -18,6 +18,7 @@ class StopwatchService {
   }
 
   void reset() {
+    stop();
     _stopwatch.reset();
   }
 }

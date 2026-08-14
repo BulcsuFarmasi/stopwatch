@@ -24,9 +24,12 @@ class FakeStopwatchService extends StopwatchService {
     stopCalls++;
     isRunning = false;
   }
+
   @override
   void reset() {
     resetCalls++;
+    stop();
+    _elapsed = Duration.zero;
   }
 
   void advance(Duration duration) {

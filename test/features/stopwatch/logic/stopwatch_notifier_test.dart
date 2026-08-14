@@ -11,10 +11,10 @@ void main() {
     late FakeStopwatchService fakeStopwatchService;
     late ProviderContainer container;
     late StopwatchNotifier stopwatchNotifier;
-    const int elapsedMiliseconds = 32;
+    const int elapsedMilliseconds = 32;
     setUp(() {
       fakeStopwatchService = FakeStopwatchService();
-      container = ProviderContainer(
+      container = ProviderContainer.test(
         overrides: [
           stopwatchServiceProvider.overrideWithValue(fakeStopwatchService),
         ],
@@ -26,17 +26,17 @@ void main() {
       fakeAsync((FakeAsync async) {
         stopwatchNotifier.start();
         fakeStopwatchService.advance(
-          Duration(milliseconds: elapsedMiliseconds),
+          Duration(milliseconds: elapsedMilliseconds),
         );
 
-        async.elapse(Duration(milliseconds: elapsedMiliseconds));
+        async.elapse(Duration(milliseconds: elapsedMilliseconds));
 
         final StopwatchState state = container.read(stopwatchNotifierProvider);
 
         expect(fakeStopwatchService.startCalls, 1);
         expect(fakeStopwatchService.isRunning, true);
         expect(state.status, StopwatchStatus.running);
-        expect(state.elapsed, Duration(milliseconds: elapsedMiliseconds));
+        expect(state.elapsed, Duration(milliseconds: elapsedMilliseconds));
       });
     });
     test(
@@ -53,46 +53,46 @@ void main() {
       fakeAsync((FakeAsync async) {
         stopwatchNotifier.start();
         fakeStopwatchService.advance(
-          Duration(milliseconds: elapsedMiliseconds),
+          Duration(milliseconds: elapsedMilliseconds),
         );
 
-        async.elapse(Duration(milliseconds: elapsedMiliseconds));
+        async.elapse(Duration(milliseconds: elapsedMilliseconds));
 
         StopwatchState state = container.read(stopwatchNotifierProvider);
 
         expect(fakeStopwatchService.startCalls, 1);
         expect(fakeStopwatchService.isRunning, true);
         expect(state.status, StopwatchStatus.running);
-        expect(state.elapsed, Duration(milliseconds: elapsedMiliseconds));
+        expect(state.elapsed, Duration(milliseconds: elapsedMilliseconds));
 
         stopwatchNotifier.pause();
-        async.elapse(Duration(milliseconds: elapsedMiliseconds));
+        async.elapse(Duration(milliseconds: elapsedMilliseconds));
         state = container.read(stopwatchNotifierProvider);
 
         expect(fakeStopwatchService.stopCalls, 1);
         expect(state.status, StopwatchStatus.paused);
         expect(fakeStopwatchService.isRunning, false);
-        expect(state.elapsed, Duration(milliseconds: elapsedMiliseconds));
+        expect(state.elapsed, Duration(milliseconds: elapsedMilliseconds));
       });
     });
-    test('reset should reset the stopwatch', () {
+    test('reset should reset the stopwatch and clear elapsed time', () {
       fakeAsync((FakeAsync async) {
         stopwatchNotifier.start();
         fakeStopwatchService.advance(
-          Duration(milliseconds: elapsedMiliseconds),
+          Duration(milliseconds: elapsedMilliseconds),
         );
 
-        async.elapse(Duration(milliseconds: elapsedMiliseconds));
+        async.elapse(Duration(milliseconds: elapsedMilliseconds));
 
         StopwatchState state = container.read(stopwatchNotifierProvider);
 
         expect(fakeStopwatchService.startCalls, 1);
         expect(fakeStopwatchService.isRunning, true);
         expect(state.status, StopwatchStatus.running);
-        expect(state.elapsed, Duration(milliseconds: elapsedMiliseconds));
+        expect(state.elapsed, Duration(milliseconds: elapsedMilliseconds));
 
         stopwatchNotifier.reset();
-        async.elapse(Duration(milliseconds: elapsedMiliseconds));
+        async.elapse(Duration(milliseconds: elapsedMilliseconds));
         state = container.read(stopwatchNotifierProvider);
 
         expect(fakeStopwatchService.resetCalls, 1);
