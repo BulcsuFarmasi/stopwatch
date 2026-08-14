@@ -15,6 +15,10 @@ class StopwatchTimeText extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Text(timeText, style: Theme.of(context).textTheme.displayMedium, textAlign: .center);
+    return Text(
+      timeText,
+      style: Theme.of(context).textTheme.displayMedium,
+      textAlign: .center,
+    );
   }
 }
