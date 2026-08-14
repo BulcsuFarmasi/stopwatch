@@ -52,7 +52,25 @@ class StopwatchNotifier extends Notifier<StopwatchState> {
     state = .initial();
   }
 
+  void recordLap() {
+      if (state.status != .running) {
+    return;
+  }
+    final Lap lap = (
+      number: state.laps.length + 1,
+      total: state.elapsed,
+      split: state.elapsed - (state.laps.isNotEmpty ? state.laps.first.total : Duration.zero)
+    );
+
+    state = state.copyWith(laps: [lap, ...state.laps]);
+  }
+
+  void clearLaps() {
+      state = state.copyWith(laps: []);
+  }
+
   void _updateElapsed(_) {
     state = state.copyWith(elapsed: _stopwatchService.elapsedTime);
   }
+
 }
