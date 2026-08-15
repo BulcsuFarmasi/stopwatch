@@ -7,5 +7,5 @@ class StopwatchConstants {
 
   static const double lapsBelowSpacing = 15;
 
-  static const double compactControlsBreakpoint = 353;
+  static const double compactControlsBreakpoint = 376;
 }

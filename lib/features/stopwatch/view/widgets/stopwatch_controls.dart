@@ -52,8 +52,8 @@ class StopwatchControls extends ConsumerWidget {
         );
 
         if (compact) {
-          return SizedBox(
-            width: constraints.maxWidth - 20,
+          return Padding(
+            padding: EdgeInsetsGeometry.symmetric(horizontal: 10),
             child: Column(
               spacing: StopwatchConstants.controlSpacing / 4,
               children: [
@@ -66,30 +66,26 @@ class StopwatchControls extends ConsumerWidget {
           );
         }
 
-        return LayoutBuilder(
-          builder: (BuildContext context, BoxConstraints constraints) {
-            return SizedBox(
-              width:
-                  MediaQuery.sizeOf(context).width <
-                      StopwatchConstants.baseWidth
-                  ? constraints.maxWidth - 20
-                  : double.infinity,
-              child: Column(
+        return Padding(
+          padding: EdgeInsets.symmetric(
+            horizontal: constraints.maxWidth < StopwatchConstants.baseWidth
+                ? 10
+                : 0,
+          ),
+          child: Column(
+            spacing: StopwatchConstants.controlSpacing,
+            children: [
+              Row(
                 spacing: StopwatchConstants.controlSpacing,
                 children: [
-                  Row(
-                    spacing: StopwatchConstants.controlSpacing,
-                    children: [
-                      Expanded(child: startButton),
-                      Expanded(child: pauseButton),
-                      Expanded(child: resetButton),
-                    ],
-                  ),
-                  StopwatchButtonSlot(child: lapButton),
+                  Expanded(child: startButton),
+                  Expanded(child: pauseButton),
+                  Expanded(child: resetButton),
                 ],
               ),
-            );
-          },
+              StopwatchButtonSlot(child: lapButton),
+            ],
+          ),
         );
       },
     );
