@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:stopwatch/features/stopwatch/constants/stopwatch_constants.dart';
+import 'package:stopwatch/features/stopwatch/view/constants/stopwatch_constants.dart';
 import 'package:stopwatch/features/stopwatch/view/widgets/stopwatch_controls.dart';
 import 'package:stopwatch/features/stopwatch/view/widgets/stopwatch_display.dart';
 import 'package:stopwatch/features/stopwatch/view/widgets/stopwatch_laps.dart';
@@ -19,7 +19,7 @@ class StopwatchScreen extends StatelessWidget {
       body: Center(
         child: ConstrainedBox(
           constraints: BoxConstraints(
-            maxWidth: StopwatchConstants.controlWidth,
+            maxWidth: StopwatchConstants.baseWidth,
           ),
           child: Padding(
             padding: const EdgeInsets.symmetric(

@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:stopwatch/app/theme/app_colors.dart';
+import 'package:stopwatch/features/stopwatch/view/constants/stopwatch_constants.dart';
 import 'package:stopwatch/features/stopwatch/logic/stopwatch_notifier.dart';
+import 'package:stopwatch/features/stopwatch/view/widgets/stopwatch_button_slot.dart';
 import 'package:stopwatch/features/stopwatch/view/widgets/stopwatch_lap_row.dart';
 import 'package:stopwatch/features/stopwatch/view/widgets/stopwatch_laps_header.dart';
 
@@ -28,10 +30,18 @@ class StopwatchLaps extends ConsumerWidget {
             itemCount: laps.length,
           ),
         ),
-        FilledButton(
-          onPressed: () => notifier.clearLaps(),
-          child: Text("Clear laps"),
-        ),
+        if (laps.isNotEmpty)
+          Padding(
+            padding: EdgeInsetsGeometry.only(
+              top: StopwatchConstants.lapsBelowSpacing,
+            ),
+            child: StopwatchButtonSlot(
+              child: OutlinedButton(
+                onPressed: () => notifier.clearLaps(),
+                child: Text("Clear laps"),
+              ),
+            ),
+          ),
       ],
     );
   }

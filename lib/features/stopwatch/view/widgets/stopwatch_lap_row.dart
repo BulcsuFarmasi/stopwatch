@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:stopwatch/features/stopwatch/constants/stopwatch_constants.dart';
+import 'package:stopwatch/features/stopwatch/view/constants/stopwatch_constants.dart';
 import 'package:stopwatch/features/stopwatch/logic/stopwatch_notifier.dart';
 
 class StopwatchLapRow extends StatelessWidget {
