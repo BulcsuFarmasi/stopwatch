@@ -18,9 +18,7 @@ class StopwatchScreen extends StatelessWidget {
       ),
       body: Center(
         child: ConstrainedBox(
-          constraints: BoxConstraints(
-            maxWidth: StopwatchConstants.baseWidth,
-          ),
+          constraints: BoxConstraints(maxWidth: StopwatchConstants.baseWidth),
           child: Padding(
             padding: const EdgeInsets.symmetric(
               vertical: StopwatchConstants.baseVerticalPadding,

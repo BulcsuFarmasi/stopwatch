@@ -56,15 +56,16 @@ class StopwatchNotifier extends Notifier<StopwatchState> {
     if (state.status != .running) {
       return;
     }
+    final Duration total = _stopwatchService.elapsedTime;
     final Lap lap = (
       number: state.laps.length + 1,
-      total: state.elapsed,
+      total: total,
       split:
-          state.elapsed -
+          total -
           (state.laps.isNotEmpty ? state.laps.first.total : Duration.zero),
     );
 
-    state = state.copyWith(laps: [lap, ...state.laps]);
+    state = state.copyWith(elapsed: total, laps: [lap, ...state.laps]);
   }
 
   void clearLaps() {

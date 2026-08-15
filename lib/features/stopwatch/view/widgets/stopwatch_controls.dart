@@ -20,6 +20,7 @@ class StopwatchControls extends ConsumerWidget {
 
     final bool isPaused = status == .paused;
     final bool isInitial = status == .initial;
+    final bool isRunning = status == .running;
 
     return LayoutBuilder(
       builder: (BuildContext context, BoxConstraints constraints) {
@@ -45,7 +46,7 @@ class StopwatchControls extends ConsumerWidget {
         );
 
         final Widget lapButton = FilledButton(
-          onPressed: () => notifier.recordLap(),
+          onPressed: isRunning ? () => notifier.recordLap() : null,
           style: FilledButton.styleFrom(backgroundColor: AppColors.secondary),
           child: Text("Lap"),
         );
@@ -68,7 +69,11 @@ class StopwatchControls extends ConsumerWidget {
         return LayoutBuilder(
           builder: (BuildContext context, BoxConstraints constraints) {
             return SizedBox(
-              width: MediaQuery.sizeOf(context).width < StopwatchConstants.baseWidth ? constraints.maxWidth - 20 : double.infinity,
+              width:
+                  MediaQuery.sizeOf(context).width <
+                      StopwatchConstants.baseWidth
+                  ? constraints.maxWidth - 20
+                  : double.infinity,
               child: Column(
                 spacing: StopwatchConstants.controlSpacing,
                 children: [
@@ -80,11 +85,11 @@ class StopwatchControls extends ConsumerWidget {
                       Expanded(child: resetButton),
                     ],
                   ),
-                  StopwatchButtonSlot(child: lapButton)
+                  StopwatchButtonSlot(child: lapButton),
                 ],
               ),
             );
-          }
+          },
         );
       },
     );
