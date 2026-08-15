@@ -19,35 +19,37 @@ class StopwatchControls extends ConsumerWidget {
     final bool isPaused = status == .paused;
     final bool isInitial = status == .initial;
 
-    return ConstrainedBox(
-      constraints: BoxConstraints(maxWidth: StopwatchConstants.controlWidth),
-      child: Row(
-        spacing: StopwatchConstants.controlSpacing,
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Expanded(
-            child: FilledButton(
-              onPressed: isInitial ? () => notifier.start() : null,
-              child: Text("Start"),
+    return Column(
+      children: [
+        FilledButton(onPressed: () => notifier.recordLap(), child: Text("Lap")),
+        Row(
+          spacing: StopwatchConstants.controlSpacing,
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Expanded(
+              child: FilledButton(
+                onPressed: isInitial ? () => notifier.start() : null,
+                child: Text("Start"),
+              ),
             ),
-          ),
-          Expanded(
-            child: FilledButton(
-              onPressed: isInitial
-                  ? null
-                  : () => isPaused ? notifier.start() : notifier.pause(),
-              child: Text(isPaused ? "Resume" : "Pause"),
+            Expanded(
+              child: FilledButton(
+                onPressed: isInitial
+                    ? null
+                    : () => isPaused ? notifier.start() : notifier.pause(),
+                child: Text(isPaused ? "Resume" : "Pause"),
+              ),
             ),
-          ),
 
-          Expanded(
-            child: FilledButton(
-              onPressed: isInitial ? null : () => notifier.reset(),
-              child: Text("Reset"),
+            Expanded(
+              child: FilledButton(
+                onPressed: isInitial ? null : () => notifier.reset(),
+                child: Text("Reset"),
+              ),
             ),
-          ),
-        ],
-      ),
+          ],
+        ),
+      ],
     );
   }
 }

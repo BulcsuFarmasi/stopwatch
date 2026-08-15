@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:stopwatch/features/stopwatch/constants/stopwatch_constants.dart';
 import 'package:stopwatch/features/stopwatch/view/widgets/stopwatch_controls.dart';
 import 'package:stopwatch/features/stopwatch/view/widgets/stopwatch_display.dart';
+import 'package:stopwatch/features/stopwatch/view/widgets/stopwatch_laps.dart';
 
 class StopwatchScreen extends StatelessWidget {
   const new({super.key});
@@ -16,10 +17,23 @@ class StopwatchScreen extends StatelessWidget {
         ),
       ),
       body: Center(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          spacing: StopwatchConstants.baseVerticalSpacing,
-          children: [StopwatchDisplay(), StopwatchControls()],
+        child: ConstrainedBox(
+          constraints: BoxConstraints(
+            maxWidth: StopwatchConstants.controlWidth,
+          ),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(
+              vertical: StopwatchConstants.baseVerticalPadding,
+            ),
+            child: Column(
+              spacing: StopwatchConstants.baseVerticalSpacing,
+              children: [
+                StopwatchDisplay(),
+                Expanded(child: StopwatchLaps()),
+                StopwatchControls(),
+              ],
+            ),
+          ),
         ),
       ),
     );
