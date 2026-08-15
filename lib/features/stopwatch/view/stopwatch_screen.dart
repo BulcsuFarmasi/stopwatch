@@ -16,23 +16,37 @@ class StopwatchScreen extends StatelessWidget {
           style: Theme.of(context).textTheme.headlineMedium,
         ),
       ),
-      body: Center(
-        child: ConstrainedBox(
-          constraints: BoxConstraints(maxWidth: StopwatchConstants.baseWidth),
-          child: Padding(
-            padding: const EdgeInsets.symmetric(
-              vertical: StopwatchConstants.baseVerticalPadding,
+      body: LayoutBuilder(
+        builder: (BuildContext context, BoxConstraints constraints) {
+          final bool compactHeight =
+              constraints.maxHeight <
+              StopwatchConstants.compactHeightBreakpoint;
+
+          return Center(
+            child: ConstrainedBox(
+              constraints: BoxConstraints(
+                maxWidth: StopwatchConstants.baseWidth,
+              ),
+              child: Padding(
+                padding: EdgeInsets.symmetric(
+                  vertical: compactHeight
+                      ? StopwatchConstants.compactVerticalPadding
+                      : StopwatchConstants.baseVerticalPadding,
+                ),
+                child: Column(
+                  spacing: compactHeight
+                      ? StopwatchConstants.compactVerticalSpacing
+                      : StopwatchConstants.baseVerticalSpacing,
+                  children: [
+                    StopwatchDisplay(),
+                    Expanded(child: StopwatchLaps()),
+                    StopwatchControls(),
+                  ],
+                ),
+              ),
             ),
-            child: Column(
-              spacing: StopwatchConstants.baseVerticalSpacing,
-              children: [
-                StopwatchDisplay(),
-                Expanded(child: StopwatchLaps()),
-                StopwatchControls(),
-              ],
-            ),
-          ),
-        ),
+          );
+        },
       ),
     );
   }
