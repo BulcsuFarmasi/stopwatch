@@ -8,6 +8,7 @@ class StopwatchApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Stopwatch',
+      debugShowCheckedModeBanner: false,
       theme: appTheme,
       home: StopwatchScreen(),
     );

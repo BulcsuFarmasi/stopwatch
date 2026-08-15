@@ -3,6 +3,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:stopwatch/features/stopwatch/service/stopwatch_service.dart';
 import 'package:stopwatch/features/stopwatch/view/stopwatch_screen.dart';
+import 'package:stopwatch/features/stopwatch/view/widgets/stopwatch_lap_row.dart';
+import 'package:stopwatch/features/stopwatch/view/widgets/stopwatch_laps_header.dart';
 
 import '../../fake_stopwatch_service.dart';
 
@@ -215,6 +217,194 @@ void main() {
           expectButtonDisabled(tester, "Pause");
         },
       );
+    });
+    group('lap button', () {
+      testWidgets("should be disabled when stopwatch has not started yet", (
+        WidgetTester tester,
+      ) async {
+        await buildWidget(tester);
+
+        expectButtonDisabled(tester, "Lap");
+      });
+
+      testWidgets("should be enabled when stopwatch has started", (
+        WidgetTester tester,
+      ) async {
+        await buildWidget(tester);
+
+        Finder finder = find.widgetWithText(FilledButton, "Start");
+
+        await tester.tap(finder);
+        await tester.pump();
+
+        expectButtonEnabled(tester, "Lap");
+      });
+      testWidgets("should be disabled when stopwatch is paused", (
+        WidgetTester tester,
+      ) async {
+        await buildWidget(tester);
+
+        Finder finder = find.widgetWithText(FilledButton, "Start");
+
+        await tester.tap(finder);
+        await tester.pump();
+
+        expectButtonEnabled(tester, "Lap");
+
+        finder = find.widgetWithText(FilledButton, "Pause");
+
+        await tester.tap(finder);
+        await tester.pump();
+
+        expectButtonDisabled(tester, "Lap");
+      });
+
+      testWidgets("should record a single lap when pressed once", (
+        WidgetTester tester,
+      ) async {
+        await buildWidget(tester);
+
+        Finder finder = find.widgetWithText(FilledButton, "Start");
+
+        await tester.tap(finder);
+        await tester.pump();
+
+        expectButtonEnabled(tester, "Lap");
+
+        fakeStopwatchService.advance(
+          Duration(milliseconds: elapsedMilliseconds),
+        );
+
+        finder = find.widgetWithText(FilledButton, "Lap");
+
+        await tester.tap(finder);
+        await tester.pump();
+
+        expect(find.byType(StopwatchLapsHeader), findsOneWidget);
+        expect(find.byType(StopwatchLapRow), findsOneWidget);
+        expect(find.text("1"), findsOneWidget);
+        expect(
+          find.ancestor(
+            of: find.text("00:00.032"),
+            matching: find.byType(StopwatchLapRow),
+          ),
+          findsNWidgets(2),
+        );
+      });
+
+      testWidgets("should record two laps when pressed twice", (
+        WidgetTester tester,
+      ) async {
+        await buildWidget(tester);
+
+        Finder finder = find.widgetWithText(FilledButton, "Start");
+
+        await tester.tap(finder);
+        await tester.pump();
+
+        expectButtonEnabled(tester, "Lap");
+
+        fakeStopwatchService.advance(
+          Duration(milliseconds: elapsedMilliseconds),
+        );
+
+        finder = find.widgetWithText(FilledButton, "Lap");
+
+        await tester.tap(finder);
+        await tester.pump();
+
+        fakeStopwatchService.advance(
+          Duration(milliseconds: elapsedMilliseconds),
+        );
+
+        await tester.tap(finder);
+        await tester.pump();
+
+        expect(find.byType(StopwatchLapsHeader), findsOneWidget);
+        expect(find.byType(StopwatchLapRow), findsNWidgets(2));
+        expect(find.text("1"), findsOneWidget);
+        expect(find.text("2"), findsOneWidget);
+        expect(
+          find.ancestor(
+            of: find.text("00:00.032"),
+            matching: find.byType(StopwatchLapRow),
+          ),
+          findsNWidgets(3),
+        );
+        expect(
+          find.ancestor(
+            of: find.text("00:00.064"),
+            matching: find.byType(StopwatchLapRow),
+          ),
+          findsOneWidget,
+        );
+      });
+    });
+
+    group("Clear laps button", () {
+      testWidgets("should not be present initially", (
+        WidgetTester tester,
+      ) async {
+        await buildWidget(tester);
+
+        expect(find.widgetWithText(OutlinedButton, "Clear laps"), findsNothing);
+      });
+
+      testWidgets("should be present when one lap is recorded", (
+        WidgetTester tester,
+      ) async {
+        await buildWidget(tester);
+
+        Finder finder = find.widgetWithText(FilledButton, "Start");
+
+        await tester.tap(finder);
+        await tester.pump();
+
+        fakeStopwatchService.advance(
+          Duration(milliseconds: elapsedMilliseconds),
+        );
+
+        finder = find.widgetWithText(FilledButton, "Lap");
+
+        await tester.tap(finder);
+        await tester.pump();
+
+        expect(
+          find.widgetWithText(OutlinedButton, "Clear laps"),
+          findsOneWidget,
+        );
+      });
+
+      testWidgets("should disappear along with the laps when pressed", (
+        WidgetTester tester,
+      ) async {
+        await buildWidget(tester);
+
+        Finder finder = find.widgetWithText(FilledButton, "Start");
+
+        await tester.tap(finder);
+        await tester.pump();
+
+        fakeStopwatchService.advance(
+          Duration(milliseconds: elapsedMilliseconds),
+        );
+
+        finder = find.widgetWithText(FilledButton, "Lap");
+
+        await tester.tap(finder);
+        await tester.pump();
+
+        expect(find.byType(StopwatchLapRow), findsOneWidget);
+
+        finder = find.widgetWithText(OutlinedButton, "Clear laps");
+
+        await tester.tap(finder);
+        await tester.pump();
+
+        expect(find.byType(StopwatchLapRow), findsNothing);
+        expect(find.widgetWithText(OutlinedButton, "Clear laps"), findsNothing);
+        expect(find.byType(StopwatchLapsHeader), findsNothing);
+      });
     });
   });
 }
