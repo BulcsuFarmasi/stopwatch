@@ -57,10 +57,20 @@ class StopwatchControls extends ConsumerWidget {
             child: Column(
               spacing: StopwatchConstants.controlSpacing / 4,
               children: [
-                SizedBox(width: double.infinity, child: startButton),
-                SizedBox(width: double.infinity, child: pauseButton),
-                SizedBox(width: double.infinity, child: resetButton),
-                SizedBox(width: double.infinity, child: lapButton),
+                Row(
+                  spacing: StopwatchConstants.controlSpacing / 4,
+                  children: [
+                    Expanded(child: startButton),
+                    Expanded(child: pauseButton),
+                  ],
+                ),
+                Row(
+                  spacing: StopwatchConstants.controlSpacing / 4,
+                  children: [
+                    Expanded(child: resetButton),
+                    Expanded(child: lapButton),
+                  ],
+                ),
               ],
             ),
           );
