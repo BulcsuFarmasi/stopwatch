@@ -9,7 +9,7 @@ import 'package:stopwatch/features/stopwatch/view/widgets/laps_header.dart';
 import '../../fake_stopwatch_service.dart';
 
 void main() {
-  group('StopWatchScreen', () {
+  group('StopwatchScreen', () {
     late FakeStopwatchService fakeStopwatchService;
     const int elapsedMilliseconds = 32;
 

@@ -16,7 +16,10 @@ class StopwatchDisplay extends ConsumerWidget {
     return Stack(
       alignment: Alignment.center,
       children: [
-        Positioned(bottom: 48, child: DigitalClock(elapsed: state.elapsed)),
+        Positioned(
+          bottom: StopwatchConstants.digitalClockBottomOffset,
+          child: DigitalClock(elapsed: state.elapsed),
+        ),
         Center(
           child: ConstrainedBox(
             constraints: BoxConstraints(

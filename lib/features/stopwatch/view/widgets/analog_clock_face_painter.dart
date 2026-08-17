@@ -4,12 +4,14 @@ import 'package:flutter/material.dart';
 import 'package:stopwatch/app/theme/app_colors.dart';
 
 class AnalogClockFacePainter extends CustomPainter {
+  const new();
+
   @override
   void paint(Canvas canvas, Size size) {
     final Paint paint = Paint()
       ..color = AppColors.text
       ..strokeWidth = 1
-      ..style = PaintingStyle.stroke;
+      ..style = .stroke;
 
     final Offset center = Offset(size.width / 2, size.height / 2);
     final double radius = size.width / 2;

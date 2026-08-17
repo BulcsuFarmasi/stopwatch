@@ -70,6 +70,12 @@ class AnalogClockHandsPainter extends CustomPainter {
         ..strokeCap = StrokeCap.round
         ..color = AppColors.primary,
     );
+
+    final Paint pinPaint = Paint()
+      ..color = AppColors.text
+      ..style = .fill;
+
+    canvas.drawCircle(center, 5, pinPaint);
   }
 
   @override
