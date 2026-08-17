@@ -3,7 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:stopwatch/app/theme/app_colors.dart';
 import 'package:stopwatch/features/stopwatch/view/constants/stopwatch_constants.dart';
 import 'package:stopwatch/features/stopwatch/logic/stopwatch_notifier.dart';
-import 'package:stopwatch/features/stopwatch/view/widgets/stopwatch_button_slot.dart';
+import 'package:stopwatch/features/stopwatch/view/widgets/button_slot.dart';
 
 class StopwatchControls extends ConsumerWidget {
   const new({super.key});
@@ -93,7 +93,7 @@ class StopwatchControls extends ConsumerWidget {
                   Expanded(child: resetButton),
                 ],
               ),
-              StopwatchButtonSlot(child: lapButton),
+              ButtonSlot(child: lapButton),
             ],
           ),
         );

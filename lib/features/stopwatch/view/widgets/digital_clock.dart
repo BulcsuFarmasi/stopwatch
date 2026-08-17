@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:stopwatch/app/theme/app_colors.dart';
 
-class StopwatchTimeText extends StatelessWidget {
+class DigitalClock extends StatelessWidget {
   const new({super.key, required this.elapsed});
 
   final Duration elapsed;

@@ -5,7 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:stopwatch/features/stopwatch/logic/stopwatch_notifier.dart';
 import 'package:stopwatch/features/stopwatch/view/constants/stopwatch_constants.dart';
 import 'package:stopwatch/features/stopwatch/view/widgets/analog_clock.dart';
-import 'package:stopwatch/features/stopwatch/view/widgets/stopwatch_time_text.dart';
+import 'package:stopwatch/features/stopwatch/view/widgets/digital_clock.dart';
 
 class StopwatchDisplay extends ConsumerWidget {
   const new({super.key});
@@ -16,10 +16,7 @@ class StopwatchDisplay extends ConsumerWidget {
     return Stack(
       alignment: Alignment.center,
       children: [
-        Positioned(
-          bottom: 48,
-          child: StopwatchTimeText(elapsed: state.elapsed),
-        ),
+        Positioned(bottom: 48, child: DigitalClock(elapsed: state.elapsed)),
         Center(
           child: ConstrainedBox(
             constraints: BoxConstraints(

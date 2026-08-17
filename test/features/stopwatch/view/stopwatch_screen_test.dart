@@ -3,8 +3,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:stopwatch/features/stopwatch/service/stopwatch_service.dart';
 import 'package:stopwatch/features/stopwatch/view/stopwatch_screen.dart';
-import 'package:stopwatch/features/stopwatch/view/widgets/stopwatch_lap_row.dart';
-import 'package:stopwatch/features/stopwatch/view/widgets/stopwatch_laps_header.dart';
+import 'package:stopwatch/features/stopwatch/view/widgets/lap_row.dart';
+import 'package:stopwatch/features/stopwatch/view/widgets/laps_header.dart';
 
 import '../../fake_stopwatch_service.dart';
 
@@ -280,13 +280,13 @@ void main() {
         await tester.tap(finder);
         await tester.pump();
 
-        expect(find.byType(StopwatchLapsHeader), findsOneWidget);
-        expect(find.byType(StopwatchLapRow), findsOneWidget);
+        expect(find.byType(LapsHeader), findsOneWidget);
+        expect(find.byType(LapRow), findsOneWidget);
         expect(find.text("1"), findsOneWidget);
         expect(
           find.ancestor(
             of: find.text("00:00.032"),
-            matching: find.byType(StopwatchLapRow),
+            matching: find.byType(LapRow),
           ),
           findsNWidgets(2),
         );
@@ -320,21 +320,21 @@ void main() {
         await tester.tap(finder);
         await tester.pump();
 
-        expect(find.byType(StopwatchLapsHeader), findsOneWidget);
-        expect(find.byType(StopwatchLapRow), findsNWidgets(2));
+        expect(find.byType(LapsHeader), findsOneWidget);
+        expect(find.byType(LapRow), findsNWidgets(2));
         expect(find.text("1"), findsOneWidget);
         expect(find.text("2"), findsOneWidget);
         expect(
           find.ancestor(
             of: find.text("00:00.032"),
-            matching: find.byType(StopwatchLapRow),
+            matching: find.byType(LapRow),
           ),
           findsNWidgets(3),
         );
         expect(
           find.ancestor(
             of: find.text("00:00.064"),
-            matching: find.byType(StopwatchLapRow),
+            matching: find.byType(LapRow),
           ),
           findsOneWidget,
         );
@@ -394,16 +394,16 @@ void main() {
         await tester.tap(finder);
         await tester.pump();
 
-        expect(find.byType(StopwatchLapRow), findsOneWidget);
+        expect(find.byType(LapRow), findsOneWidget);
 
         finder = find.widgetWithText(OutlinedButton, "Clear laps");
 
         await tester.tap(finder);
         await tester.pump();
 
-        expect(find.byType(StopwatchLapRow), findsNothing);
+        expect(find.byType(LapRow), findsNothing);
         expect(find.widgetWithText(OutlinedButton, "Clear laps"), findsNothing);
-        expect(find.byType(StopwatchLapsHeader), findsNothing);
+        expect(find.byType(LapsHeader), findsNothing);
       });
     });
   });

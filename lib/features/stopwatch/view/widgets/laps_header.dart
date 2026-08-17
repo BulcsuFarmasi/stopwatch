@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:stopwatch/app/theme/app_colors.dart';
 import 'package:stopwatch/features/stopwatch/view/constants/stopwatch_constants.dart';
 
-class StopwatchLapsHeader extends StatelessWidget {
+class LapsHeader extends StatelessWidget {
   const new({super.key});
 
   @override
