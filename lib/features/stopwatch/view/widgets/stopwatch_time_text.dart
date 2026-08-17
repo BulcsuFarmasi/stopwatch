@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:stopwatch/app/theme/app_colors.dart';
 
 class StopwatchTimeText extends StatelessWidget {
   const new({super.key, required this.elapsed});
@@ -17,7 +18,8 @@ class StopwatchTimeText extends StatelessWidget {
   Widget build(BuildContext context) {
     return Text(
       timeText,
-      style: Theme.of(context).textTheme.displayMedium,
+      style: Theme.of(context).textTheme.bodyMedium
+          ?.copyWith(color: AppColors.primary),
       textAlign: .center,
     );
   }

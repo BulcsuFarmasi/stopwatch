@@ -30,7 +30,7 @@ class StopwatchNotifier extends Notifier<StopwatchState> {
       return;
     }
     _stopwatchService.start();
-    _timer = Timer.periodic(Duration(milliseconds: 30), _updateElapsed);
+    _timer = Timer.periodic(Duration(milliseconds: 16), _updateElapsed);
     state = state.copyWith(status: .running);
   }
 
