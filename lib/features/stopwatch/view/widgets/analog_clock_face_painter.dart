@@ -2,15 +2,18 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:stopwatch/app/theme/app_colors.dart';
+import 'package:stopwatch/features/stopwatch/view/constants/stopwatch_constants.dart';
 
 class AnalogClockFacePainter extends CustomPainter {
   const new();
 
   @override
   void paint(Canvas canvas, Size size) {
+    final double scale =
+        size.shortestSide / StopwatchConstants.analogClockBaseDiameter;
     final Paint paint = Paint()
       ..color = AppColors.text
-      ..strokeWidth = 1
+      ..strokeWidth = max(0.5, scale)
       ..style = .stroke;
 
     final Offset center = Offset(size.width / 2, size.height / 2);
@@ -28,7 +31,7 @@ class AnalogClockFacePainter extends CustomPainter {
       final TextPainter textPainter = TextPainter(
         text: TextSpan(
           text: '$displayNumber',
-          style: const TextStyle(fontSize: 16, color: AppColors.text),
+          style: TextStyle(fontSize: 16 * scale, color: AppColors.text),
         ),
         textDirection: TextDirection.ltr,
       )..layout();

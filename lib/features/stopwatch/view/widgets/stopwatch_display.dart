@@ -13,30 +13,33 @@ class StopwatchDisplay extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final StopwatchState state = ref.watch(stopwatchNotifierProvider);
-    return Stack(
-      alignment: Alignment.center,
-      children: [
-        Positioned(
-          bottom: StopwatchConstants.digitalClockBottomOffset,
-          child: DigitalClock(elapsed: state.elapsed),
-        ),
-        Center(
-          child: ConstrainedBox(
-            constraints: BoxConstraints(
-              maxWidth:
-                  (min(
-                    MediaQuery.sizeOf(context).width,
-                    StopwatchConstants.baseWidth,
-                  ) *
-                  0.6),
-            ),
-            child: AspectRatio(
-              aspectRatio: 1,
-              child: AnalogClock(elapsed: state.elapsed),
-            ),
+    return LayoutBuilder(
+      builder: (BuildContext context, BoxConstraints constraints) {
+        final double widthBasedDiameter =
+            min(
+              MediaQuery.sizeOf(context).width,
+              StopwatchConstants.baseWidth,
+            ) *
+            StopwatchConstants.analogClockDiameterRatio;
+        final double diameter = min(widthBasedDiameter, constraints.maxHeight);
+        final double scale =
+            diameter / StopwatchConstants.analogClockBaseDiameter;
+
+        return SizedBox.square(
+          dimension: diameter,
+          child: Stack(
+            alignment: Alignment.center,
+            children: [
+              Positioned(
+                bottom:
+                    diameter * StopwatchConstants.digitalClockBottomOffsetRatio,
+                child: DigitalClock(elapsed: state.elapsed, scale: scale),
+              ),
+              AnalogClock(elapsed: state.elapsed),
+            ],
           ),
-        ),
-      ],
+        );
+      },
     );
   }
 }

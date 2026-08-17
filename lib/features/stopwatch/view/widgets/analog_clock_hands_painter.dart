@@ -2,6 +2,7 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:stopwatch/app/theme/app_colors.dart';
+import 'package:stopwatch/features/stopwatch/view/constants/stopwatch_constants.dart';
 
 class AnalogClockHandsPainter extends CustomPainter {
   new({required this.elapsed});
@@ -10,6 +11,8 @@ class AnalogClockHandsPainter extends CustomPainter {
 
   @override
   void paint(Canvas canvas, Size size) {
+    final double scale =
+        size.shortestSide / StopwatchConstants.analogClockBaseDiameter;
     final Offset center = Offset(size.width / 2, size.height / 2);
 
     final double radius = size.width / 2;
@@ -48,7 +51,7 @@ class AnalogClockHandsPainter extends CustomPainter {
       center,
       hourEnd,
       Paint()
-        ..strokeWidth = 5
+        ..strokeWidth = 5 * scale
         ..strokeCap = StrokeCap.round
         ..color = AppColors.text,
     );
@@ -57,7 +60,7 @@ class AnalogClockHandsPainter extends CustomPainter {
       center,
       minuteEnd,
       Paint()
-        ..strokeWidth = 4
+        ..strokeWidth = 4 * scale
         ..strokeCap = StrokeCap.round
         ..color = AppColors.text,
     );
@@ -66,7 +69,7 @@ class AnalogClockHandsPainter extends CustomPainter {
       center,
       secondEnd,
       Paint()
-        ..strokeWidth = 2
+        ..strokeWidth = 2 * scale
         ..strokeCap = StrokeCap.round
         ..color = AppColors.primary,
     );
@@ -75,7 +78,7 @@ class AnalogClockHandsPainter extends CustomPainter {
       ..color = AppColors.text
       ..style = .fill;
 
-    canvas.drawCircle(center, 5, pinPaint);
+    canvas.drawCircle(center, 5 * scale, pinPaint);
   }
 
   @override

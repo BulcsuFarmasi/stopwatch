@@ -6,7 +6,10 @@ class StopwatchConstants {
   static const double compactVerticalPadding = 12;
   static const double compactHeightBreakpoint = 500;
 
-  static const double digitalClockBottomOffset = 48;
+  static const double analogClockDiameterRatio = 0.6;
+  static const double analogClockBaseDiameter =
+      baseWidth * analogClockDiameterRatio;
+  static const double digitalClockBottomOffsetRatio = 0.21;
 
   static const double lapsBelowSpacing = 15;
 

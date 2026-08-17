@@ -6,7 +6,9 @@ import 'package:stopwatch/features/stopwatch/logic/stopwatch_notifier.dart';
 import 'package:stopwatch/features/stopwatch/view/widgets/button_slot.dart';
 
 class StopwatchControls extends ConsumerWidget {
-  const new({super.key});
+  const new({super.key, this.useCompactLayout = false});
+
+  final bool useCompactLayout;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -25,8 +27,9 @@ class StopwatchControls extends ConsumerWidget {
     return LayoutBuilder(
       builder: (BuildContext context, BoxConstraints constraints) {
         final bool compact =
+            useCompactLayout ||
             MediaQuery.sizeOf(context).width <
-            StopwatchConstants.compactControlsBreakpoint;
+                StopwatchConstants.compactControlsBreakpoint;
 
         final Widget startButton = FilledButton(
           onPressed: isInitial ? () => notifier.start() : null,
