@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:stopwatch/features/stopwatch/view/constants/stopwatch_constants.dart';
 
-class StopwatchButtonSlot extends StatelessWidget {
+class ButtonSlot extends StatelessWidget {
   const new({super.key, required this.child});
 
   final Widget child;

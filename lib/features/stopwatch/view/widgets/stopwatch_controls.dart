@@ -3,10 +3,12 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:stopwatch/app/theme/app_colors.dart';
 import 'package:stopwatch/features/stopwatch/view/constants/stopwatch_constants.dart';
 import 'package:stopwatch/features/stopwatch/logic/stopwatch_notifier.dart';
-import 'package:stopwatch/features/stopwatch/view/widgets/stopwatch_button_slot.dart';
+import 'package:stopwatch/features/stopwatch/view/widgets/button_slot.dart';
 
 class StopwatchControls extends ConsumerWidget {
-  const new({super.key});
+  const new({super.key, this.useCompactLayout = false});
+
+  final bool useCompactLayout;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -25,8 +27,9 @@ class StopwatchControls extends ConsumerWidget {
     return LayoutBuilder(
       builder: (BuildContext context, BoxConstraints constraints) {
         final bool compact =
+            useCompactLayout ||
             MediaQuery.sizeOf(context).width <
-            StopwatchConstants.compactControlsBreakpoint;
+                StopwatchConstants.compactControlsBreakpoint;
 
         final Widget startButton = FilledButton(
           onPressed: isInitial ? () => notifier.start() : null,
@@ -57,10 +60,20 @@ class StopwatchControls extends ConsumerWidget {
             child: Column(
               spacing: StopwatchConstants.controlSpacing / 4,
               children: [
-                SizedBox(width: double.infinity, child: startButton),
-                SizedBox(width: double.infinity, child: pauseButton),
-                SizedBox(width: double.infinity, child: resetButton),
-                SizedBox(width: double.infinity, child: lapButton),
+                Row(
+                  spacing: StopwatchConstants.controlSpacing / 4,
+                  children: [
+                    Expanded(child: startButton),
+                    Expanded(child: pauseButton),
+                  ],
+                ),
+                Row(
+                  spacing: StopwatchConstants.controlSpacing / 4,
+                  children: [
+                    Expanded(child: resetButton),
+                    Expanded(child: lapButton),
+                  ],
+                ),
               ],
             ),
           );
@@ -83,7 +96,7 @@ class StopwatchControls extends ConsumerWidget {
                   Expanded(child: resetButton),
                 ],
               ),
-              StopwatchButtonSlot(child: lapButton),
+              ButtonSlot(child: lapButton),
             ],
           ),
         );

@@ -3,9 +3,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:stopwatch/app/theme/app_colors.dart';
 import 'package:stopwatch/features/stopwatch/view/constants/stopwatch_constants.dart';
 import 'package:stopwatch/features/stopwatch/logic/stopwatch_notifier.dart';
-import 'package:stopwatch/features/stopwatch/view/widgets/stopwatch_button_slot.dart';
-import 'package:stopwatch/features/stopwatch/view/widgets/stopwatch_lap_row.dart';
-import 'package:stopwatch/features/stopwatch/view/widgets/stopwatch_laps_header.dart';
+import 'package:stopwatch/features/stopwatch/view/widgets/button_slot.dart';
+import 'package:stopwatch/features/stopwatch/view/widgets/lap_row.dart';
+import 'package:stopwatch/features/stopwatch/view/widgets/laps_header.dart';
 
 class StopwatchLaps extends ConsumerWidget {
   const new({super.key});
@@ -20,10 +20,10 @@ class StopwatchLaps extends ConsumerWidget {
     );
     return Column(
       children: [
-        if (laps.isNotEmpty) StopwatchLapsHeader(),
+        if (laps.isNotEmpty) LapsHeader(),
         Expanded(
           child: ListView.separated(
-            itemBuilder: (_, int index) => StopwatchLapRow(lap: laps[index]),
+            itemBuilder: (_, int index) => LapRow(lap: laps[index]),
             separatorBuilder: (_, _) {
               return Divider(color: AppColors.text);
             },
@@ -35,7 +35,7 @@ class StopwatchLaps extends ConsumerWidget {
             padding: EdgeInsetsGeometry.only(
               top: StopwatchConstants.lapsBelowSpacing,
             ),
-            child: StopwatchButtonSlot(
+            child: ButtonSlot(
               child: OutlinedButton(
                 onPressed: () => notifier.clearLaps(),
                 child: Text("Clear laps"),

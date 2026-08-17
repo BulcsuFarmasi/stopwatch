@@ -36,13 +36,14 @@ class StopwatchScreen extends StatelessWidget {
                         : StopwatchConstants.baseVerticalPadding,
                   ),
                   child: Column(
+                    mainAxisAlignment: MainAxisAlignment.spaceAround,
                     spacing: compactHeight
                         ? StopwatchConstants.compactVerticalSpacing
                         : StopwatchConstants.baseVerticalSpacing,
                     children: [
-                      StopwatchDisplay(),
+                      Flexible(child: StopwatchDisplay()),
                       Expanded(child: StopwatchLaps()),
-                      StopwatchControls(),
+                      StopwatchControls(useCompactLayout: compactHeight),
                     ],
                   ),
                 ),

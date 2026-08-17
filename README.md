@@ -1,8 +1,8 @@
 # Stopwatch
 
-A responsive stopwatch application built with Flutter and Dart. It supports
-the complete basic stopwatch flow as well as recording, displaying, and
-clearing lap times.
+A responsive stopwatch application built with Flutter and Dart. It combines
+the complete basic stopwatch flow with lap recording and synchronized digital
+and analog displays.
 
 ## Features
 
@@ -21,6 +21,13 @@ clearing lap times.
 - Show the newest lap first.
 - Clear all recorded laps without interrupting the stopwatch.
 - Clear elapsed time and laps when resetting the stopwatch.
+
+### Analog clock
+
+- Visualize elapsed time with hour, minute, and second hands.
+- Keep the analog hands synchronized with the digital elapsed time.
+- Scale the clock face, numerals, hands, center pin, and digital readout to the
+  available space.
 
 ## Architecture
 
@@ -53,20 +60,22 @@ accumulated timer drift.
 
 ## Responsive design
 
-The content has a constrained maximum width for larger displays. Controls
-reflow into a vertical layout on narrow screens, and vertical spacing is
-reduced when the available height is limited. Lap entries scroll independently
-while the lap header and Clear button remain visible.
+The content has a constrained maximum width for larger displays. Controls use
+a compact two-column layout on narrow or short screens, while spacing and
+padding are reduced when height is limited. The clock scales according to both
+the available width and height. Lap entries scroll independently while the lap
+header and Clear button remain visible.
 
-The layout targets typical mobile, web, and desktop viewport sizes. Extremely
-short viewports below approximately 350 logical pixels may overflow.
+The portrait layout is the primary mobile experience. Landscape remains
+functional on typical device sizes, although unusually short viewports provide
+less space for the clock and lap list.
 
 ## Getting started
 
 ### Prerequisites
 
-- Flutter installed and available on your `PATH`
-- Dart SDK compatible with `^3.13.0`
+- Flutter 3.47.0 installed and available on your `PATH`
+- Dart 3.13.0 (included with Flutter 3.47.0)
 
 ### Install dependencies
 

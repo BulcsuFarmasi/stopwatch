@@ -7,7 +7,7 @@ import 'package:stopwatch/features/stopwatch/service/stopwatch_service.dart';
 import '../../fake_stopwatch_service.dart';
 
 void main() {
-  group('StopWatchNotifier', () {
+  group('StopwatchNotifier', () {
     late FakeStopwatchService fakeStopwatchService;
     late ProviderContainer container;
     late StopwatchNotifier stopwatchNotifier;
