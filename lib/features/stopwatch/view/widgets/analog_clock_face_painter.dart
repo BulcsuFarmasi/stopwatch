@@ -31,7 +31,12 @@ class AnalogClockFacePainter extends CustomPainter {
       final TextPainter textPainter = TextPainter(
         text: TextSpan(
           text: '$displayNumber',
-          style: TextStyle(fontSize: 16 * scale, color: AppColors.text),
+          style: TextStyle(
+            fontFamily: 'RobotoCondensed',
+            fontWeight: .w500,
+            fontSize: 16 * scale,
+            color: AppColors.text,
+          ),
         ),
         textDirection: TextDirection.ltr,
       )..layout();
