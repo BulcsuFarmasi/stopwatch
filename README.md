@@ -53,8 +53,6 @@ lib/
 - Riverpod provides state management and dependency injection.
 - The UI is divided into focused widgets for the display, controls, and lap
   list.
-- Separate `CustomPainter` implementations render the static clock face and
-  animated clock hands, avoiding unnecessary repaints of the face.
 
 The periodic timer only refreshes the UI from the underlying `Stopwatch`.
 Elapsed time is therefore not calculated by counting timer callbacks, avoiding
