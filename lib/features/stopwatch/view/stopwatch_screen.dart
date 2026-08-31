@@ -3,6 +3,7 @@ import 'package:stopwatch/features/stopwatch/view/constants/stopwatch_constants.
 import 'package:stopwatch/features/stopwatch/view/widgets/stopwatch_controls.dart';
 import 'package:stopwatch/features/stopwatch/view/widgets/stopwatch_display.dart';
 import 'package:stopwatch/features/stopwatch/view/widgets/stopwatch_laps.dart';
+import 'package:stopwatch/l10n/app_strings.dart';
 
 class StopwatchScreen extends StatelessWidget {
   const new({super.key});
@@ -12,7 +13,7 @@ class StopwatchScreen extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          "Stopwatch",
+          AppStrings.appTitle,
           style: Theme.of(context).textTheme.headlineMedium,
         ),
       ),

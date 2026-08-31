@@ -6,6 +6,7 @@ import 'package:stopwatch/features/stopwatch/logic/stopwatch_notifier.dart';
 import 'package:stopwatch/features/stopwatch/view/widgets/button_slot.dart';
 import 'package:stopwatch/features/stopwatch/view/widgets/lap_row.dart';
 import 'package:stopwatch/features/stopwatch/view/widgets/laps_header.dart';
+import 'package:stopwatch/l10n/app_strings.dart';
 
 class StopwatchLaps extends ConsumerWidget {
   const new({super.key});
@@ -38,7 +39,7 @@ class StopwatchLaps extends ConsumerWidget {
             child: ButtonSlot(
               child: OutlinedButton(
                 onPressed: () => notifier.clearLaps(),
-                child: Text("Clear laps"),
+                child: Text(AppStrings.clearLaps),
               ),
             ),
           ),

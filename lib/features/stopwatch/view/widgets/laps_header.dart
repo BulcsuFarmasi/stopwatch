@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:stopwatch/app/theme/app_colors.dart';
 import 'package:stopwatch/features/stopwatch/view/constants/stopwatch_constants.dart';
+import 'package:stopwatch/l10n/app_strings.dart';
 
 class LapsHeader extends StatelessWidget {
   const new({super.key});
@@ -16,21 +17,21 @@ class LapsHeader extends StatelessWidget {
           children: [
             Expanded(
               child: Text(
-                'Number',
+                AppStrings.lapsNumber,
                 style: theme.textTheme.bodyMedium,
                 textAlign: .center,
               ),
             ),
             Expanded(
               child: Text(
-                'Split',
+                AppStrings.lapsSplit,
                 style: theme.textTheme.bodyMedium,
                 textAlign: .center,
               ),
             ),
             Expanded(
               child: Text(
-                'Total',
+                AppStrings.lapsTotal,
                 style: theme.textTheme.bodyMedium,
                 textAlign: .center,
               ),
