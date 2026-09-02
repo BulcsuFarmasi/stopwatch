@@ -9,37 +9,42 @@ class LapsHeader extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final ThemeData theme = Theme.of(context);
-    return Column(
-      children: [
-        Row(
-          spacing: StopwatchConstants.controlSpacing,
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Expanded(
-              child: Text(
-                AppStrings.lapsNumber,
-                style: theme.textTheme.bodyMedium,
-                textAlign: .center,
+    return Semantics(
+      container: true,
+      excludeSemantics: true,
+      label: AppStrings.lapsHeaderSemantics,
+      child: Column(
+        children: [
+          Row(
+            spacing: StopwatchConstants.controlSpacing,
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Expanded(
+                child: Text(
+                  AppStrings.lapsNumber,
+                  style: theme.textTheme.bodyMedium,
+                  textAlign: .center,
+                ),
               ),
-            ),
-            Expanded(
-              child: Text(
-                AppStrings.lapsSplit,
-                style: theme.textTheme.bodyMedium,
-                textAlign: .center,
+              Expanded(
+                child: Text(
+                  AppStrings.lapsSplit,
+                  style: theme.textTheme.bodyMedium,
+                  textAlign: .center,
+                ),
               ),
-            ),
-            Expanded(
-              child: Text(
-                AppStrings.lapsTotal,
-                style: theme.textTheme.bodyMedium,
-                textAlign: .center,
+              Expanded(
+                child: Text(
+                  AppStrings.lapsTotal,
+                  style: theme.textTheme.bodyMedium,
+                  textAlign: .center,
+                ),
               ),
-            ),
-          ],
-        ),
-        Divider(color: AppColors.text),
-      ],
+            ],
+          ),
+          Divider(color: AppColors.text),
+        ],
+      ),
     );
   }
 }

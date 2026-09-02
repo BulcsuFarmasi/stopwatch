@@ -53,7 +53,18 @@ class StopwatchControls extends ConsumerWidget {
 
         final Widget lapButton = FilledButton(
           onPressed: isRunning ? () => notifier.recordLap() : null,
-          style: FilledButton.styleFrom(backgroundColor: AppColors.secondary),
+          style:
+              FilledButton.styleFrom(
+                backgroundColor: AppColors.secondary,
+                foregroundColor: AppColors.text,
+              ).copyWith(
+                side: WidgetStateProperty.resolveWith<BorderSide?>((states) {
+                  if (states.contains(WidgetState.focused)) {
+                    return BorderSide(color: AppColors.text, width: 3);
+                  }
+                  return null;
+                }),
+              ),
           child: Text(AppStrings.controlsLap),
         );
 

@@ -406,5 +406,59 @@ void main() {
         expect(find.byType(LapsHeader), findsNothing);
       });
     });
+
+    group("accessiblity", () {
+      testWidgets('meets tap-target accessibility guidelines initially', (
+        tester,
+      ) async {
+        await buildWidget(tester);
+
+        final SemanticsHandle handle = tester.ensureSemantics();
+
+        try {
+          await expectLater(tester, meetsGuideline(labeledTapTargetGuideline));
+          await expectLater(tester, meetsGuideline(androidTapTargetGuideline));
+          await expectLater(tester, meetsGuideline(iOSTapTargetGuideline));
+        } finally {
+          handle.dispose();
+        }
+      });
+      testWidgets(
+        'meets tap-target accessibility guidelines when clear laps is present',
+        (tester) async {
+          await buildWidget(tester);
+
+          Finder finder = find.widgetWithText(FilledButton, "Start");
+
+          await tester.tap(finder);
+          await tester.pump();
+
+          fakeStopwatchService.advance(
+            Duration(milliseconds: elapsedMilliseconds),
+          );
+
+          finder = find.widgetWithText(FilledButton, "Lap");
+
+          await tester.tap(finder);
+          await tester.pump();
+
+          final SemanticsHandle handle = tester.ensureSemantics();
+
+          try {
+            await expectLater(
+              tester,
+              meetsGuideline(labeledTapTargetGuideline),
+            );
+            await expectLater(
+              tester,
+              meetsGuideline(androidTapTargetGuideline),
+            );
+            await expectLater(tester, meetsGuideline(iOSTapTargetGuideline));
+          } finally {
+            handle.dispose();
+          }
+        },
+      );
+    });
   });
 }
