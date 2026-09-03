@@ -24,12 +24,15 @@ class StopwatchDisplay extends ConsumerWidget {
                 StopwatchConstants.baseWidth,
               ) *
               StopwatchConstants.analogClockDiameterRatio;
-          final double diameter = min(widthBasedDiameter, constraints.maxHeight);
+          final double diameter = min(
+            widthBasedDiameter,
+            constraints.maxHeight,
+          );
           final double scale =
               diameter / StopwatchConstants.analogClockBaseDiameter;
-      
+
           final DurationParts durationParts = splitDuration(state.elapsed);
-      
+
           return Semantics(
             container: true,
             excludeSemantics: true,

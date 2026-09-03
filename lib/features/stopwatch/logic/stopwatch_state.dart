@@ -21,6 +21,13 @@ class StopwatchState {
     );
   }
 
+  StopwatchSession toSession({required DateTime savedAt}) => StopwatchSession(
+    elapsed: elapsed,
+    savedAtUtc: savedAt.toUtc(),
+    status: status,
+    laps: laps,
+  );
+
   @override
   bool operator ==(Object other) {
     return identical(this, other) ||
@@ -33,7 +40,3 @@ class StopwatchState {
   @override
   int get hashCode => Object.hash(elapsed, status, laps);
 }
-
-enum StopwatchStatus { initial, running, paused }
-
-typedef Lap = ({Duration total, Duration split, int number});

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:stopwatch/features/stopwatch/model/lap.dart';
 import 'package:stopwatch/features/stopwatch/view/constants/stopwatch_constants.dart';
-import 'package:stopwatch/features/stopwatch/logic/stopwatch_notifier.dart';
 import 'package:stopwatch/features/stopwatch/view/formatters/format_duration.dart';
 import 'package:stopwatch/l10n/app_strings.dart';
 

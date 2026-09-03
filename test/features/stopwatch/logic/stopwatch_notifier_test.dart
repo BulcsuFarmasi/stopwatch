@@ -2,6 +2,7 @@ import 'package:fake_async/fake_async.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:stopwatch/features/stopwatch/logic/stopwatch_notifier.dart';
+import 'package:stopwatch/features/stopwatch/model/stopwatch_status.dart';
 import 'package:stopwatch/features/stopwatch/service/stopwatch_service.dart';
 
 import '../../fake_stopwatch_service.dart';

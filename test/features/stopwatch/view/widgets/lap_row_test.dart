@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:stopwatch/features/stopwatch/logic/stopwatch_notifier.dart';
+import 'package:stopwatch/features/stopwatch/model/lap.dart';
 import 'package:stopwatch/features/stopwatch/view/widgets/lap_row.dart';
 
 void main() {
@@ -12,7 +12,7 @@ void main() {
     testWidgets("should have the correct semantics label", (
       WidgetTester tester,
     ) async {
-      final Lap lap = (
+      final Lap lap = Lap(
         number: 2,
         split: Duration(milliseconds: 32),
         total: Duration(milliseconds: 64),
