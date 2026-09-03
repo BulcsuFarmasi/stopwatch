@@ -15,43 +15,45 @@ class StopwatchDisplay extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final StopwatchState state = ref.watch(stopwatchNotifierProvider);
-    return LayoutBuilder(
-      builder: (BuildContext context, BoxConstraints constraints) {
-        final double widthBasedDiameter =
-            min(
-              MediaQuery.sizeOf(context).width,
-              StopwatchConstants.baseWidth,
-            ) *
-            StopwatchConstants.analogClockDiameterRatio;
-        final double diameter = min(widthBasedDiameter, constraints.maxHeight);
-        final double scale =
-            diameter / StopwatchConstants.analogClockBaseDiameter;
-
-        final DurationParts durationParts = splitDuration(state.elapsed);
-
-        return Semantics(
-          container: true,
-          excludeSemantics: true,
-          liveRegion: false,
-          label:
-              "${AppStrings.elapsedTime} ${AppStrings.durationSemantics(minutes: durationParts.minutes, seconds: durationParts.seconds, milliseconds: durationParts.milliseconds)}",
-          child: SizedBox.square(
-            dimension: diameter,
-            child: Stack(
-              alignment: Alignment.center,
-              children: [
-                Positioned(
-                  bottom:
-                      diameter *
-                      StopwatchConstants.digitalClockBottomOffsetRatio,
-                  child: DigitalClock(elapsed: state.elapsed, scale: scale),
-                ),
-                AnalogClock(elapsed: state.elapsed),
-              ],
+    return RepaintBoundary(
+      child: LayoutBuilder(
+        builder: (BuildContext context, BoxConstraints constraints) {
+          final double widthBasedDiameter =
+              min(
+                MediaQuery.sizeOf(context).width,
+                StopwatchConstants.baseWidth,
+              ) *
+              StopwatchConstants.analogClockDiameterRatio;
+          final double diameter = min(widthBasedDiameter, constraints.maxHeight);
+          final double scale =
+              diameter / StopwatchConstants.analogClockBaseDiameter;
+      
+          final DurationParts durationParts = splitDuration(state.elapsed);
+      
+          return Semantics(
+            container: true,
+            excludeSemantics: true,
+            liveRegion: false,
+            label:
+                "${AppStrings.elapsedTime} ${AppStrings.durationSemantics(minutes: durationParts.minutes, seconds: durationParts.seconds, milliseconds: durationParts.milliseconds)}",
+            child: SizedBox.square(
+              dimension: diameter,
+              child: Stack(
+                alignment: Alignment.center,
+                children: [
+                  Positioned(
+                    bottom:
+                        diameter *
+                        StopwatchConstants.digitalClockBottomOffsetRatio,
+                    child: DigitalClock(elapsed: state.elapsed, scale: scale),
+                  ),
+                  AnalogClock(elapsed: state.elapsed),
+                ],
+              ),
             ),
-          ),
-        );
-      },
+          );
+        },
+      ),
     );
   }
 }
