@@ -33,14 +33,16 @@ void main() {
 
           async.elapse(Duration(milliseconds: elapsedMilliseconds));
 
-          final StopwatchState state = container.read(
+          final AsyncValue<StopwatchState> state = container.read(
             stopwatchNotifierProvider,
           );
 
+          final StopwatchState current = state.requireValue;
+
           expect(fakeStopwatchService.startCalls, 1);
           expect(fakeStopwatchService.isRunning, true);
-          expect(state.status, StopwatchStatus.running);
-          expect(state.elapsed, Duration(milliseconds: elapsedMilliseconds));
+          expect(current.status, StopwatchStatus.running);
+          expect(current.elapsed, Duration(milliseconds: elapsedMilliseconds));
         });
       });
       test(
@@ -64,21 +66,27 @@ void main() {
 
           async.elapse(Duration(milliseconds: elapsedMilliseconds));
 
-          StopwatchState state = container.read(stopwatchNotifierProvider);
+          AsyncValue<StopwatchState> state = container.read(
+            stopwatchNotifierProvider,
+          );
+
+          StopwatchState current = state.requireValue;
 
           expect(fakeStopwatchService.startCalls, 1);
           expect(fakeStopwatchService.isRunning, true);
-          expect(state.status, StopwatchStatus.running);
-          expect(state.elapsed, Duration(milliseconds: elapsedMilliseconds));
+          expect(current.status, StopwatchStatus.running);
+          expect(current.elapsed, Duration(milliseconds: elapsedMilliseconds));
 
           stopwatchNotifier.pause();
           async.elapse(Duration(milliseconds: elapsedMilliseconds));
           state = container.read(stopwatchNotifierProvider);
 
+          current = state.requireValue;
+
           expect(fakeStopwatchService.stopCalls, 1);
-          expect(state.status, StopwatchStatus.paused);
+          expect(current.status, StopwatchStatus.paused);
           expect(fakeStopwatchService.isRunning, false);
-          expect(state.elapsed, Duration(milliseconds: elapsedMilliseconds));
+          expect(current.elapsed, Duration(milliseconds: elapsedMilliseconds));
         });
       });
     });
@@ -95,23 +103,28 @@ void main() {
 
           stopwatchNotifier.recordLap();
 
-          StopwatchState state = container.read(stopwatchNotifierProvider);
+          AsyncValue<StopwatchState> state = container.read(
+            stopwatchNotifierProvider,
+          );
+
+          StopwatchState current = state.requireValue;
 
           expect(fakeStopwatchService.startCalls, 1);
           expect(fakeStopwatchService.isRunning, true);
-          expect(state.status, StopwatchStatus.running);
-          expect(state.elapsed, Duration(milliseconds: elapsedMilliseconds));
-          expect(state.laps.length, 1);
+          expect(current.status, StopwatchStatus.running);
+          expect(current.elapsed, Duration(milliseconds: elapsedMilliseconds));
+          expect(current.laps.length, 1);
 
           stopwatchNotifier.reset();
           async.elapse(Duration(milliseconds: elapsedMilliseconds));
           state = container.read(stopwatchNotifierProvider);
+          current = state.requireValue;
 
           expect(fakeStopwatchService.resetCalls, 1);
-          expect(state.status, StopwatchStatus.initial);
+          expect(current.status, StopwatchStatus.initial);
           expect(fakeStopwatchService.isRunning, false);
-          expect(state.elapsed, Duration.zero);
-          expect(state.laps.length, 0);
+          expect(current.elapsed, Duration.zero);
+          expect(current.laps.length, 0);
         });
       });
     });
@@ -124,16 +137,19 @@ void main() {
 
         stopwatchNotifier.recordLap();
 
-        StopwatchState state = container.read(stopwatchNotifierProvider);
+        final AsyncValue<StopwatchState> state = container.read(
+          stopwatchNotifierProvider,
+        );
+        final StopwatchState current = state.requireValue;
 
-        expect(state.laps.length, 1);
-        expect(state.laps.first.number, 1);
+        expect(current.laps.length, 1);
+        expect(current.laps.first.number, 1);
         expect(
-          state.laps.first.total,
+          current.laps.first.total,
           Duration(milliseconds: elapsedMilliseconds),
         );
         expect(
-          state.laps.first.split,
+          current.laps.first.split,
           Duration(milliseconds: elapsedMilliseconds),
         );
       });
@@ -146,9 +162,12 @@ void main() {
 
         stopwatchNotifier.recordLap();
 
-        StopwatchState state = container.read(stopwatchNotifierProvider);
+        AsyncValue<StopwatchState> state = container.read(
+          stopwatchNotifierProvider,
+        );
+        StopwatchState current = state.requireValue;
 
-        expect(state.laps.length, 1);
+        expect(current.laps.length, 1);
 
         fakeStopwatchService.advance(
           Duration(milliseconds: elapsedMilliseconds),
@@ -157,48 +176,58 @@ void main() {
         stopwatchNotifier.recordLap();
 
         state = container.read(stopwatchNotifierProvider);
+        current = state.requireValue;
 
-        expect(state.laps.length, 2);
-        expect(state.laps.first.number, 2);
+        expect(current.laps.length, 2);
+        expect(current.laps.first.number, 2);
         expect(
-          state.laps.first.total,
+          current.laps.first.total,
           Duration(milliseconds: elapsedMilliseconds) * 2,
         );
         expect(
-          state.laps.first.split,
+          current.laps.first.split,
           Duration(milliseconds: elapsedMilliseconds),
         );
       });
 
       test('should not record lap while stopwatch is not yet running', () {
-        StopwatchState state = container.read(stopwatchNotifierProvider);
+        AsyncValue<StopwatchState> state = container.read(
+          stopwatchNotifierProvider,
+        );
+        StopwatchState current = state.requireValue;
 
-        expect(state.laps, isEmpty);
+        expect(current.laps, isEmpty);
 
         stopwatchNotifier.recordLap();
 
         state = container.read(stopwatchNotifierProvider);
+        current = state.requireValue;
 
-        expect(state.laps, isEmpty);
+        expect(current.laps, isEmpty);
       });
 
       test('should not record lap while stopwatch is paused', () {
         stopwatchNotifier.start();
-        StopwatchState state = container.read(stopwatchNotifierProvider);
+        AsyncValue<StopwatchState> state = container.read(
+          stopwatchNotifierProvider,
+        );
+        StopwatchState current = state.requireValue;
 
-        expect(state.laps, isEmpty);
+        expect(current.laps, isEmpty);
 
         stopwatchNotifier.pause();
 
         state = container.read(stopwatchNotifierProvider);
+        current = state.requireValue;
 
-        expect(state.laps, isEmpty);
+        expect(current.laps, isEmpty);
 
         stopwatchNotifier.recordLap();
 
         state = container.read(stopwatchNotifierProvider);
+        current = state.requireValue;
 
-        expect(state.laps, isEmpty);
+        expect(current.laps, isEmpty);
       });
     });
     group('clear laps', () {
@@ -210,15 +239,19 @@ void main() {
 
         stopwatchNotifier.recordLap();
 
-        StopwatchState state = container.read(stopwatchNotifierProvider);
+        AsyncValue<StopwatchState> state = container.read(
+          stopwatchNotifierProvider,
+        );
+        StopwatchState current = state.requireValue;
 
-        expect(state.laps.length, 1);
+        expect(current.laps.length, 1);
 
         stopwatchNotifier.clearLaps();
 
         state = container.read(stopwatchNotifierProvider);
+        current = state.requireValue;
 
-        expect(state.laps.length, 0);
+        expect(current.laps.length, 0);
       });
     });
   });

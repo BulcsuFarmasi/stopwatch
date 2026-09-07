@@ -19,7 +19,7 @@ class StopwatchControls extends ConsumerWidget {
     );
 
     final StopwatchStatus status = ref.watch(
-      stopwatchNotifierProvider.select((StopwatchState state) => state.status),
+      stopwatchNotifierProvider.select((AsyncValue<StopwatchState> state) => state.requireValue.status),
     );
 
     final bool isPaused = status == .paused;

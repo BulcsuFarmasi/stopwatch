@@ -6,7 +6,7 @@ import 'package:stopwatch/features/stopwatch/view/widgets/stopwatch_laps.dart';
 import 'package:stopwatch/l10n/app_strings.dart';
 
 class StopwatchScreen extends StatelessWidget {
-  const new({super.key});
+  const StopwatchScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
