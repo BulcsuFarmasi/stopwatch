@@ -12,7 +12,9 @@ class StopwatchService {
 
   void restoreElapsed(Duration elapsed) {
     _baseElapsed = elapsed;
-    _stopwatch..stop()..reset();
+    _stopwatch
+      ..stop()
+      ..reset();
   }
 
   void start() {

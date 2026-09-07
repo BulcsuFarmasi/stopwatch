@@ -14,7 +14,9 @@ class StopwatchDisplay extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final AsyncValue<StopwatchState> state = ref.watch(stopwatchNotifierProvider);
+    final AsyncValue<StopwatchState> state = ref.watch(
+      stopwatchNotifierProvider,
+    );
     return RepaintBoundary(
       child: LayoutBuilder(
         builder: (BuildContext context, BoxConstraints constraints) {
@@ -31,7 +33,9 @@ class StopwatchDisplay extends ConsumerWidget {
           final double scale =
               diameter / StopwatchConstants.analogClockBaseDiameter;
 
-          final DurationParts durationParts = splitDuration(state.requireValue.elapsed);
+          final DurationParts durationParts = splitDuration(
+            state.requireValue.elapsed,
+          );
 
           return Semantics(
             container: true,
@@ -48,7 +52,10 @@ class StopwatchDisplay extends ConsumerWidget {
                     bottom:
                         diameter *
                         StopwatchConstants.digitalClockBottomOffsetRatio,
-                    child: DigitalClock(elapsed: state.requireValue.elapsed, scale: scale),
+                    child: DigitalClock(
+                      elapsed: state.requireValue.elapsed,
+                      scale: scale,
+                    ),
                   ),
                   AnalogClock(elapsed: state.requireValue.elapsed),
                 ],

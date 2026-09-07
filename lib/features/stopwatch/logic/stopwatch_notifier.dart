@@ -11,12 +11,14 @@ import 'package:stopwatch/features/stopwatch/service/stopwatch_service.dart';
 part 'stopwatch_state.dart';
 
 final AsyncNotifierProvider<StopwatchNotifier, StopwatchState>
-stopwatchNotifierProvider = AsyncNotifierProvider<StopwatchNotifier, StopwatchState>(
-  StopwatchNotifier.new,
-);
+stopwatchNotifierProvider =
+    AsyncNotifierProvider<StopwatchNotifier, StopwatchState>(
+      StopwatchNotifier.new,
+    );
 
 class StopwatchNotifier extends AsyncNotifier<StopwatchState> {
   Timer? _timer;
+  bool _refreshEnabled = false;
   late final StopwatchService _stopwatchService;
   late final StopwatchSessionRepository _stopwatchSessionRepository;
 
@@ -25,24 +27,37 @@ class StopwatchNotifier extends AsyncNotifier<StopwatchState> {
     _stopwatchService = ref.read(stopwatchServiceProvider);
     _stopwatchSessionRepository = ref.read(stopwatchSessionRepositoryProvider);
     ref.onDispose(() {
-      _timer?.cancel();
+      stopRefreshTimer();
       _stopwatchService.stop();
     });
 
-    return (await _restore()) ?? .initial();
+    final StopwatchState? restoredState = await _restore();
+
+    return restoredState ?? .initial();
   }
-
-
 
   void start() {
     final StopwatchState current = state.requireValue;
     if (current.status == .running) {
       return;
     }
-    _stopwatchService.start();
-    _startRefreshTimer();
     state = AsyncValue.data(current.copyWith(status: .running));
-   _saveToSession();
+    _stopwatchService.start();
+    _scheduleRefreshTimer(status: .running);
+    _saveToSession();
+  }
+
+  void startRefreshTimer() {
+    _refreshEnabled = true;
+
+    final StopwatchState? current = state.value;
+
+    if (current == null || current.status != .running) {
+      return;
+    }
+
+    _scheduleRefreshTimer(status: current.status);
+    _updateElapsed();
   }
 
   void pause() {
@@ -52,10 +67,9 @@ class StopwatchNotifier extends AsyncNotifier<StopwatchState> {
     }
     _stopwatchService.stop();
     _timer?.cancel();
-    state = AsyncValue.data( current.copyWith(
-      status: .paused,
-      elapsed: _stopwatchService.elapsedTime,
-    ));
+    state = AsyncValue.data(
+      current.copyWith(status: .paused, elapsed: _stopwatchService.elapsedTime),
+    );
     _saveToSession();
   }
 
@@ -64,6 +78,11 @@ class StopwatchNotifier extends AsyncNotifier<StopwatchState> {
     _timer?.cancel();
     state = AsyncValue.data(.initial());
     _stopwatchSessionRepository.clear();
+  }
+
+  void stopRefreshTimer() {
+    _refreshEnabled = false;
+    _timer?.cancel();
   }
 
   void recordLap() {
@@ -80,31 +99,35 @@ class StopwatchNotifier extends AsyncNotifier<StopwatchState> {
           (current.laps.isNotEmpty ? current.laps.first.total : Duration.zero),
     );
 
-    state = AsyncValue.data(current.copyWith(elapsed: total, laps: [lap, ...current.laps]));
+    state = AsyncValue.data(
+      current.copyWith(elapsed: total, laps: [lap, ...current.laps]),
+    );
     _saveToSession();
   }
 
   void clearLaps() {
     final StopwatchState current = state.requireValue;
-    state =  AsyncValue.data(current.copyWith(elapsed: _stopwatchService.elapsedTime, laps: []));
-   _saveToSession();
+    state = AsyncValue.data(
+      current.copyWith(elapsed: _stopwatchService.elapsedTime, laps: []),
+    );
+    _saveToSession();
   }
 
-  void _updateElapsed(_) {
-    final StopwatchState current = state.requireValue; 
-    state = AsyncValue.data(current.copyWith(elapsed: _stopwatchService.elapsedTime));
+  void _updateElapsed() {
+    final StopwatchState current = state.requireValue;
+    state = AsyncValue.data(
+      current.copyWith(elapsed: _stopwatchService.elapsedTime),
+    );
   }
 
   void _saveToSession() {
     final StopwatchState current = state.requireValue;
-    _stopwatchSessionRepository.save(current.toSession(savedAt: DateTime.now()));
+    _stopwatchSessionRepository.save(
+      current.toSession(savedAt: DateTime.now()),
+    );
   }
 
-  void _startRefreshTimer() {
-    _timer = Timer.periodic(Duration(milliseconds: 16), _updateElapsed);
-  }
-  
-    Future<StopwatchState?> _restore() async {
+  Future<StopwatchState?> _restore() async {
     final StopwatchSession? session = await _stopwatchSessionRepository.load();
 
     if (session == null || session.status == .initial) {
@@ -113,24 +136,37 @@ class StopwatchNotifier extends AsyncNotifier<StopwatchState> {
 
     final DateTime nowUtc = DateTime.now().toUtc();
 
-    final Duration restoredElapsed = switch(session.status) {
-      .running => session.elapsed + _nonNegativeDifference(nowUtc, session.savedAtUtc),
+    final Duration restoredElapsed = switch (session.status) {
+      .running =>
+        session.elapsed + _nonNegativeDifference(nowUtc, session.savedAtUtc),
       .paused => session.elapsed,
-      _ => Duration.zero
+      _ => Duration.zero,
     };
 
     _stopwatchService.restoreElapsed(restoredElapsed);
 
-    
-
     if (session.status == .running) {
       _stopwatchService.start();
-      _startRefreshTimer();
+      _scheduleRefreshTimer(status: session.status);
     }
 
-    return StopwatchState(elapsed: restoredElapsed, status: session.status, laps: session.laps);
+    return StopwatchState(
+      elapsed: restoredElapsed,
+      status: session.status,
+      laps: session.laps,
+    );
   }
 
+  void _scheduleRefreshTimer({StopwatchStatus? status}) {
+    if (status != .running || (_timer?.isActive ?? false) || !_refreshEnabled) {
+      return;
+    }
+
+    _timer = Timer.periodic(
+      Duration(milliseconds: 16),
+      (_) => _updateElapsed(),
+    );
+  }
 
   Duration _nonNegativeDifference(DateTime later, DateTime earlier) {
     final Duration difference = later.difference(earlier);
