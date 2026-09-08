@@ -37,6 +37,7 @@ class LapRow extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Expanded(
+            flex: 1,
             child: Text(
               '${lap.number}',
               style: theme.textTheme.bodyMedium,
@@ -44,6 +45,7 @@ class LapRow extends StatelessWidget {
             ),
           ),
           Expanded(
+            flex: 2,
             child: Text(
               formatDuration(lap.split),
               style: theme.textTheme.bodyMedium,
@@ -51,6 +53,7 @@ class LapRow extends StatelessWidget {
             ),
           ),
           Expanded(
+            flex: 2,
             child: Text(
               formatDuration(lap.total),
               style: theme.textTheme.bodyMedium,

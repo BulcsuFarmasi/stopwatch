@@ -18,9 +18,9 @@ class StopwatchControls extends ConsumerWidget {
       stopwatchNotifierProvider.notifier,
     );
 
-    final StopwatchStatus status = ref.watch(
+    final StopwatchStatus? status = ref.watch(
       stopwatchNotifierProvider.select(
-        (AsyncValue<StopwatchState> state) => state.requireValue.status,
+        (AsyncValue<StopwatchState> state) => state.value?.status,
       ),
     );
 
@@ -34,6 +34,7 @@ class StopwatchControls extends ConsumerWidget {
             useCompactLayout ||
             MediaQuery.sizeOf(context).width <
                 StopwatchConstants.compactControlsBreakpoint;
+        final bool landscape = MediaQuery.orientationOf(context) == .landscape;
 
         final Widget startButton = FilledButton(
           onPressed: isInitial ? () => notifier.start() : null,
@@ -41,7 +42,7 @@ class StopwatchControls extends ConsumerWidget {
         );
 
         final Widget pauseButton = FilledButton(
-          onPressed: isInitial
+          onPressed: isInitial || status == null
               ? null
               : () => isPaused ? notifier.start() : notifier.pause(),
           child: Text(
@@ -50,7 +51,7 @@ class StopwatchControls extends ConsumerWidget {
         );
 
         final Widget resetButton = FilledButton(
-          onPressed: isInitial ? null : () => notifier.reset(),
+          onPressed: isInitial || status == null ? null : () => notifier.reset(),
           child: Text(AppStrings.controlsReset),
         );
 
@@ -71,10 +72,23 @@ class StopwatchControls extends ConsumerWidget {
           child: Text(AppStrings.controlsLap),
         );
 
+
+        if(landscape) {
+          return Column(
+            mainAxisSize: MainAxisSize.min,
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            spacing: StopwatchConstants.controlSpacing,
+            children: [startButton, pauseButton, resetButton, lapButton],
+          );
+        }
+
         if (compact) {
           return Padding(
             padding: EdgeInsetsGeometry.symmetric(horizontal: 10),
             child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.center,
               spacing: StopwatchConstants.controlSpacing / 4,
               children: [
                 Row(

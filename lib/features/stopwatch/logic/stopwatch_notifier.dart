@@ -130,6 +130,8 @@ class StopwatchNotifier extends AsyncNotifier<StopwatchState> {
   Future<StopwatchState?> _restore() async {
     final StopwatchSession? session = await _stopwatchSessionRepository.load();
 
+    print("session: $session");
+
     if (session == null || session.status == .initial) {
       return null;
     }

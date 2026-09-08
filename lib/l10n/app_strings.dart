@@ -17,7 +17,7 @@ abstract final class AppStrings {
   static const String controlsLap = "Lap";
 
   // Laps
-  static const String lapsNumber = "Number";
+  static const String lapsLap = "Lap";
   static const String lapsSplit = "Split";
   static const String lapsTotal = "Total";
   static const String clearLaps = "Clear laps";

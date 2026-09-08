@@ -14,8 +14,8 @@ class Lap {
   };
 
   factory fromJson(Map<String, dynamic> json) => Lap(
-    total: Duration(milliseconds: json["totalMicroseconds"]),
-    split: Duration(milliseconds: json["splitMicroSeconds"]),
+    total: Duration(microseconds: json["totalMicroseconds"]),
+    split: Duration(microseconds: json["splitMicroseconds"]),
     number: json["number"],
   );
 

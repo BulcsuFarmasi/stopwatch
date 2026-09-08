@@ -11,7 +11,7 @@ class ButtonSlot extends StatelessWidget {
     return LayoutBuilder(
       builder: (context, constraints) {
         final bool compact =
-            MediaQuery.sizeOf(context).width <
+            constraints.maxWidth <
             StopwatchConstants.compactControlsBreakpoint;
 
         final double width = compact

@@ -25,16 +25,19 @@ class StopwatchSession {
     "schemaVersion": schemaVersion,
   };
 
-  factory fromJson(Map<String, dynamic> json) => StopwatchSession(
+  factory fromJson(Map<String, dynamic> json) {
+    return StopwatchSession(
     elapsed: Duration(microseconds: json["elapsedMicroseconds"]),
     savedAtUtc: DateTime.fromMicrosecondsSinceEpoch(
       json["savedAtMicroseconds"],
       isUtc: true,
     ),
     status: StopwatchStatus.values.byName(json["status"]),
-    laps: (json["laps"] as List<Map<String, dynamic>>)
+    laps: (json["laps"] as List<dynamic>)
+        .map((dynamic item) => item as Map<String, dynamic>)
         .map(Lap.fromJson)
         .toList(),
     schemaVersion: json["schemaVersion"],
   );
+  }
 }

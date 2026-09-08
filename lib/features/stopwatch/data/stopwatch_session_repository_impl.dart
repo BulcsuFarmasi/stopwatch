@@ -26,6 +26,14 @@ class StopwatchSessionRepositoryImpl extends StopwatchSessionRepository {
       _sharedPreferencesKey,
     );
 
+    print(sessionEncoded);
+
+    try {
+      print(StopwatchSession.fromJson(json.decode(sessionEncoded!)));
+    } catch (e, stackTrace) {
+      print("$e $stackTrace");
+    }
+
     return sessionEncoded != null
         ? StopwatchSession.fromJson(json.decode(sessionEncoded))
         : null;

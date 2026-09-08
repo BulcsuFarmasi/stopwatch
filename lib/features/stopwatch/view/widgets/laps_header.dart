@@ -20,13 +20,15 @@ class LapsHeader extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Expanded(
+                flex: 1,
                 child: Text(
-                  AppStrings.lapsNumber,
+                  AppStrings.lapsLap,
                   style: theme.textTheme.bodyMedium,
                   textAlign: .center,
                 ),
               ),
               Expanded(
+                flex: 2,
                 child: Text(
                   AppStrings.lapsSplit,
                   style: theme.textTheme.bodyMedium,
@@ -34,6 +36,7 @@ class LapsHeader extends StatelessWidget {
                 ),
               ),
               Expanded(
+                flex: 2,
                 child: Text(
                   AppStrings.lapsTotal,
                   style: theme.textTheme.bodyMedium,
