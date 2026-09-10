@@ -55,7 +55,11 @@ class StopwatchSessionHandler {
   }
 
   Future<void> save(StoredStopwatchSession session) async {
-    await _stopwatchSessionRepository.save(session);
+    try {
+      await _stopwatchSessionRepository.save(session);
+    } catch (_) {
+      throw SessionIssue.saveFailed;
+    }
   }
 
   Future<void> clear() async {

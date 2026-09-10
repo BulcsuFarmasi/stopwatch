@@ -1,1 +1,1 @@
-enum SessionIssue { invalidSavedSession, readFailed, clearFailed }
+enum SessionIssue { invalidSavedSession, readFailed, clearFailed, saveFailed }

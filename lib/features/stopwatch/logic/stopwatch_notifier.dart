@@ -46,7 +46,7 @@ class StopwatchNotifier extends AsyncNotifier<StopwatchState> {
     state = AsyncValue.data(current.copyWith(status: .running));
     _stopwatchService.start();
     _scheduleRefreshTimer(status: .running);
-    _saveToSession();
+    unawaited(_saveToSession());
   }
 
   void startRefreshTimer() {
@@ -72,7 +72,7 @@ class StopwatchNotifier extends AsyncNotifier<StopwatchState> {
     state = AsyncValue.data(
       current.copyWith(status: .paused, elapsed: _stopwatchService.elapsedTime),
     );
-    _saveToSession();
+    unawaited(_saveToSession());
   }
 
   Future<void> reset() async {
@@ -104,7 +104,7 @@ class StopwatchNotifier extends AsyncNotifier<StopwatchState> {
     state = AsyncValue.data(
       current.copyWith(elapsed: total, laps: [lap, ...current.laps]),
     );
-    _saveToSession();
+    unawaited(_saveToSession());
   }
 
   void clearLaps() {
@@ -117,7 +117,7 @@ class StopwatchNotifier extends AsyncNotifier<StopwatchState> {
     state = AsyncValue.data(
       current.copyWith(elapsed: _stopwatchService.elapsedTime, laps: []),
     );
-    _saveToSession();
+    unawaited(_saveToSession());
   }
 
   Future<void> retrySessionRestore() async {
@@ -154,9 +154,24 @@ class StopwatchNotifier extends AsyncNotifier<StopwatchState> {
     );
   }
 
-  void _saveToSession() {
-    final StopwatchState current = state.requireValue;
-    _stopwatchSessionHandler.save(current.toSession(savedAt: DateTime.now()));
+  Future<void> _saveToSession() async {
+    final StoredStopwatchSession session = state.requireValue.toSession(
+      savedAt: DateTime.now(),
+    );
+
+    try {
+      await _stopwatchSessionHandler.save(session);
+
+      final StopwatchState? current = state.value;
+      if (current?.sessionIssue == .saveFailed) {
+        state = AsyncValue.data(current!.copyWith(sessionIssue: null));
+      }
+    } on SessionIssue catch (issue) {
+      final StopwatchState? current = state.value;
+      if (current != null) {
+        state = AsyncValue.data(current.copyWith(sessionIssue: issue));
+      }
+    }
   }
 
   Future<StopwatchState?> _restore() async {
