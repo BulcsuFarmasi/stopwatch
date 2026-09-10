@@ -53,10 +53,7 @@ class StopwatchDisplay extends ConsumerWidget {
                     bottom:
                         diameter *
                         StopwatchConstants.digitalClockBottomOffsetRatio,
-                    child: DigitalClock(
-                      elapsed: elapsed,
-                      scale: scale,
-                    ),
+                    child: DigitalClock(elapsed: elapsed, scale: scale),
                   ),
                   AnalogClock(elapsed: elapsed),
                 ],

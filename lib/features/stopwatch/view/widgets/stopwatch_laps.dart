@@ -14,11 +14,13 @@ class StopwatchLaps extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final List<Lap> laps = ref.watch(
-      stopwatchNotifierProvider.select(
-        (AsyncValue<StopwatchState> state) => state.value?.laps,
-      ),
-    ) ?? [];
+    final List<Lap> laps =
+        ref.watch(
+          stopwatchNotifierProvider.select(
+            (AsyncValue<StopwatchState> state) => state.value?.laps,
+          ),
+        ) ??
+        [];
     final StopwatchNotifier notifier = ref.read(
       stopwatchNotifierProvider.notifier,
     );

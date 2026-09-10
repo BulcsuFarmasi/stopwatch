@@ -51,7 +51,9 @@ class StopwatchControls extends ConsumerWidget {
         );
 
         final Widget resetButton = FilledButton(
-          onPressed: isInitial || status == null ? null : () => notifier.reset(),
+          onPressed: isInitial || status == null
+              ? null
+              : () => notifier.reset(),
           child: Text(AppStrings.controlsReset),
         );
 
@@ -72,8 +74,7 @@ class StopwatchControls extends ConsumerWidget {
           child: Text(AppStrings.controlsLap),
         );
 
-
-        if(landscape) {
+        if (landscape) {
           return Column(
             mainAxisSize: MainAxisSize.min,
             mainAxisAlignment: MainAxisAlignment.center,

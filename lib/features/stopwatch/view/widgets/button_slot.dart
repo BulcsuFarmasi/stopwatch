@@ -11,8 +11,7 @@ class ButtonSlot extends StatelessWidget {
     return LayoutBuilder(
       builder: (context, constraints) {
         final bool compact =
-            constraints.maxWidth <
-            StopwatchConstants.compactControlsBreakpoint;
+            constraints.maxWidth < StopwatchConstants.compactControlsBreakpoint;
 
         final double width = compact
             ? constraints.maxWidth - 20

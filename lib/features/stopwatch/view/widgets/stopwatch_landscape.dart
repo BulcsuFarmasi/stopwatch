@@ -17,7 +17,7 @@ class StopwatchLandscape extends StatelessWidget {
         children: [
           Expanded(flex: 5, child: StopwatchDisplay()),
           Expanded(flex: 7, child: StopwatchLaps()),
-          Expanded(flex: 3, child: StopwatchControls(useCompactLayout: true,)),
+          Expanded(flex: 3, child: StopwatchControls(useCompactLayout: true)),
         ],
       ),
     );
