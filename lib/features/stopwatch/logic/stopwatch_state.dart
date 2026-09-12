@@ -50,11 +50,7 @@ class StopwatchState {
   }
 
   StopwatchSession toSession() =>
-      StopwatchSession(
-        elapsed: elapsed,
-        status: status,
-        laps: laps,
-      );
+      StopwatchSession(elapsed: elapsed, status: status, laps: laps);
 
   bool get areStopwatchActionsBlocked =>
       isSessionOperationInProgress ||

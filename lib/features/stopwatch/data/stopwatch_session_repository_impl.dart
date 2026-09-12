@@ -1,26 +1,34 @@
 import 'dart:convert';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:stopwatch/features/stopwatch/data/shared_preferences.dart';
 import 'package:stopwatch/features/stopwatch/data/stopwatch_session_repository.dart';
 import 'package:stopwatch/features/stopwatch/model/session_issue.dart';
 import 'package:stopwatch/features/stopwatch/model/stored_stopwatch_session.dart';
 
 final Provider<StopwatchSessionRepository> stopwatchSessionRepositoryProvider =
     Provider<StopwatchSessionRepository>(
-      (_) => StopwatchSessionRepositoryImpl(),
+      (Ref ref) => StopwatchSessionRepositoryImpl(
+        ref.read(sharedPreferencesAsyncProvider),
+      ),
     );
 
 class StopwatchSessionRepositoryImpl extends StopwatchSessionRepository {
-  static const _sharedPreferencesKey = "stopwatchSession";
+  @visibleForTesting
+  static const sharedPreferencesKey = "stopwatchSession";
 
-  final SharedPreferencesAsync _preferences = SharedPreferencesAsync();
+  StopwatchSessionRepositoryImpl(SharedPreferencesAsync preferences)
+    : _preferences = preferences;
+
+  final SharedPreferencesAsync _preferences;
   Future<void> _pendingWrite = Future.value();
 
   @override
   Future<void> clear() async {
     try {
-      await _enqueue(() => _preferences.remove(_sharedPreferencesKey));
+      await _enqueue(() => _preferences.remove(sharedPreferencesKey));
     } catch (_) {
       throw SessionIssue.clearFailed;
     }
@@ -31,7 +39,7 @@ class StopwatchSessionRepositoryImpl extends StopwatchSessionRepository {
     String? sessionEncoded;
 
     try {
-      sessionEncoded = await _preferences.getString(_sharedPreferencesKey);
+      sessionEncoded = await _preferences.getString(sharedPreferencesKey);
     } catch (e) {
       // Future integration: report the original exception and stack trace
       // to Sentry or Firebase Crashlytics before translating it to SessionIssue.
@@ -60,7 +68,7 @@ class StopwatchSessionRepositoryImpl extends StopwatchSessionRepository {
     try {
       await _enqueue(
         () => _preferences.setString(
-          _sharedPreferencesKey,
+          sharedPreferencesKey,
           json.encode(session.toJson()),
         ),
       );
