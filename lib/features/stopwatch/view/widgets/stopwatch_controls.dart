@@ -18,15 +18,20 @@ class StopwatchControls extends ConsumerWidget {
       stopwatchNotifierProvider.notifier,
     );
 
-    final StopwatchStatus? status = ref.watch(
-      stopwatchNotifierProvider.select(
-        (AsyncValue<StopwatchState> state) => state.value?.status,
-      ),
-    );
+    final ({StopwatchStatus? status, bool areStopwatchActionsBlocked}) state =
+        ref.watch(
+          stopwatchNotifierProvider.select(
+            (AsyncValue<StopwatchState> state) => (
+              status: state.value?.status,
+              areStopwatchActionsBlocked:
+                  state.value?.areStopwatchActionsBlocked ?? false,
+            ),
+          ),
+        );
 
-    final bool isPaused = status == .paused;
-    final bool isInitial = status == .initial;
-    final bool isRunning = status == .running;
+    final bool isPaused = state.status == .paused;
+    final bool isInitial = state.status == .initial;
+    final bool isRunning = state.status == .running;
 
     return LayoutBuilder(
       builder: (BuildContext context, BoxConstraints constraints) {
@@ -37,12 +42,17 @@ class StopwatchControls extends ConsumerWidget {
         final bool landscape = MediaQuery.orientationOf(context) == .landscape;
 
         final Widget startButton = FilledButton(
-          onPressed: isInitial ? () => notifier.start() : null,
+          onPressed: isInitial && !state.areStopwatchActionsBlocked
+              ? () => notifier.start()
+              : null,
           child: Text(AppStrings.controlsStart),
         );
 
         final Widget pauseButton = FilledButton(
-          onPressed: isInitial || status == null
+          onPressed:
+              isInitial ||
+                  state.status == null ||
+                  state.areStopwatchActionsBlocked
               ? null
               : () => isPaused ? notifier.start() : notifier.pause(),
           child: Text(
@@ -51,14 +61,19 @@ class StopwatchControls extends ConsumerWidget {
         );
 
         final Widget resetButton = FilledButton(
-          onPressed: isInitial || status == null
+          onPressed:
+              isInitial ||
+                  state.status == null ||
+                  state.areStopwatchActionsBlocked
               ? null
               : () => notifier.reset(),
           child: Text(AppStrings.controlsReset),
         );
 
         final Widget lapButton = FilledButton(
-          onPressed: isRunning ? () => notifier.recordLap() : null,
+          onPressed: isRunning && !state.areStopwatchActionsBlocked
+              ? () => notifier.recordLap()
+              : null,
           style:
               FilledButton.styleFrom(
                 backgroundColor: AppColors.secondary,
@@ -79,7 +94,7 @@ class StopwatchControls extends ConsumerWidget {
             mainAxisSize: MainAxisSize.min,
             mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.stretch,
-            spacing: StopwatchConstants.controlSpacing,
+            spacing: StopwatchConstants.compactSpacing,
             children: [startButton, pauseButton, resetButton, lapButton],
           );
         }

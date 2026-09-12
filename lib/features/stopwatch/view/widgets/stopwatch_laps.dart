@@ -14,36 +14,40 @@ class StopwatchLaps extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final List<Lap> laps =
-        ref.watch(
-          stopwatchNotifierProvider.select(
-            (AsyncValue<StopwatchState> state) => state.value?.laps,
-          ),
-        ) ??
-        [];
+    final ({List<Lap> laps, bool areStopwatchActionsBlocked}) state = ref.watch(
+      stopwatchNotifierProvider.select(
+        (AsyncValue<StopwatchState> state) => (
+          laps: state.value?.laps ?? [],
+          areStopwatchActionsBlocked:
+              state.value?.areStopwatchActionsBlocked ?? false,
+        ),
+      ),
+    );
     final StopwatchNotifier notifier = ref.read(
       stopwatchNotifierProvider.notifier,
     );
     return Column(
       children: [
-        if (laps.isNotEmpty) LapsHeader(),
+        if (state.laps.isNotEmpty) LapsHeader(),
         Expanded(
           child: ListView.separated(
-            itemBuilder: (_, int index) => LapRow(lap: laps[index]),
+            itemBuilder: (_, int index) => LapRow(lap: state.laps[index]),
             separatorBuilder: (_, _) {
               return Divider(color: AppColors.text);
             },
-            itemCount: laps.length,
+            itemCount: state.laps.length,
           ),
         ),
-        if (laps.isNotEmpty)
+        if (state.laps.isNotEmpty)
           Padding(
             padding: EdgeInsetsGeometry.only(
               top: StopwatchConstants.lapsBelowSpacing,
             ),
             child: ButtonSlot(
               child: OutlinedButton(
-                onPressed: () => notifier.clearLaps(),
+                onPressed: state.areStopwatchActionsBlocked
+                    ? null
+                    : () => notifier.clearLaps(),
                 child: Text(AppStrings.clearLaps),
               ),
             ),

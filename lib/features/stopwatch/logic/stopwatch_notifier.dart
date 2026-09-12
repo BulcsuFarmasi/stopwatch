@@ -20,7 +20,6 @@ stopwatchNotifierProvider =
 class StopwatchNotifier extends AsyncNotifier<StopwatchState> {
   Timer? _timer;
   bool _refreshEnabled = false;
-  bool _sessionOperationInProgress = false;
   late final StopwatchService _stopwatchService;
   late final StopwatchSessionHandler _stopwatchSessionHandler;
 
@@ -40,7 +39,7 @@ class StopwatchNotifier extends AsyncNotifier<StopwatchState> {
 
   void start() {
     final StopwatchState current = state.requireValue;
-    if (current.status == .running || _isSessionOperationBlocked(current)) {
+    if (current.status == .running || current.areStopwatchActionsBlocked) {
       return;
     }
     state = AsyncValue.data(current.copyWith(status: .running));
@@ -64,7 +63,7 @@ class StopwatchNotifier extends AsyncNotifier<StopwatchState> {
 
   void pause() {
     final StopwatchState current = state.requireValue;
-    if (current.status != .running || _isSessionOperationBlocked(current)) {
+    if (current.status != .running || current.areStopwatchActionsBlocked) {
       return;
     }
     _stopwatchService.stop();
@@ -78,7 +77,7 @@ class StopwatchNotifier extends AsyncNotifier<StopwatchState> {
   Future<void> reset() async {
     final StopwatchState current = state.requireValue;
 
-    if (current.status == .initial || _isSessionOperationBlocked(current)) {
+    if (current.status == .initial || current.areStopwatchActionsBlocked) {
       return;
     }
 
@@ -95,7 +94,7 @@ class StopwatchNotifier extends AsyncNotifier<StopwatchState> {
 
   void recordLap() {
     final StopwatchState current = state.requireValue;
-    if (current.status != .running || _isSessionOperationBlocked(current)) {
+    if (current.status != .running || current.areStopwatchActionsBlocked) {
       return;
     }
     final Duration total = _stopwatchService.elapsedTime;
@@ -110,7 +109,7 @@ class StopwatchNotifier extends AsyncNotifier<StopwatchState> {
   void clearLaps() {
     final StopwatchState current = state.requireValue;
 
-    if (_isSessionOperationBlocked(current)) {
+    if (current.areStopwatchActionsBlocked) {
       return;
     }
 
@@ -122,12 +121,18 @@ class StopwatchNotifier extends AsyncNotifier<StopwatchState> {
 
   Future<void> retrySessionRestore() async {
     await _runSessionOperation(() async {
+      // Clear the current issue so a repeated failure emits a new state.
+      final current = state.requireValue;
+      state = AsyncValue.data(current.copyWith(sessionIssue: null));
+
       state = AsyncValue.data(await _restore() ?? .initial());
     });
   }
 
   Future<void> clearSavedSession() async {
     await _runSessionOperation(() async {
+      // Clear the current issue so a repeated failure emits a new state.
+      state = AsyncValue.data(.initial());
       try {
         await _stopwatchSessionHandler.clear();
         state = AsyncValue.data(.initial());
@@ -194,6 +199,7 @@ class StopwatchNotifier extends AsyncNotifier<StopwatchState> {
         elapsed: session.elapsed,
         status: session.status,
         laps: session.laps,
+        isSessionOperationInProgress: false,
       );
     } on SessionIssue catch (issue) {
       return .withIssue(issue);
@@ -212,23 +218,26 @@ class StopwatchNotifier extends AsyncNotifier<StopwatchState> {
   }
 
   Future<void> _runSessionOperation(Future<void> Function() operation) async {
-    if (_sessionOperationInProgress) {
+    final StopwatchState current = state.requireValue;
+    if (current.isSessionOperationInProgress) {
       return;
     }
 
-    _sessionOperationInProgress = true;
+    state = AsyncValue.data(
+      current.copyWith(isSessionOperationInProgress: true),
+    );
 
     try {
       await operation();
     } finally {
-      _sessionOperationInProgress = false;
-    }
-  }
+      final StopwatchState? current = state.value;
 
-  bool _isSessionOperationBlocked(StopwatchState current) {
-    return _sessionOperationInProgress ||
-        current.sessionIssue == .readFailed ||
-        current.sessionIssue == .clearFailed;
+      if (current != null) {
+        state = AsyncValue.data(
+          current.copyWith(isSessionOperationInProgress: false),
+        );
+      }
+    }
   }
 
   Lap _getLapFromState(StopwatchState state, Duration total) => Lap(
