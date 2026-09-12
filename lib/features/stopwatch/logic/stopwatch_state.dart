@@ -49,10 +49,9 @@ class StopwatchState {
     );
   }
 
-  StoredStopwatchSession toSession({required DateTime savedAt}) =>
-      StoredStopwatchSession(
+  StopwatchSession toSession() =>
+      StopwatchSession(
         elapsed: elapsed,
-        savedAtUtc: savedAt.toUtc(),
         status: status,
         laps: laps,
       );

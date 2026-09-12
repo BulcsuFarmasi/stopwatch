@@ -5,16 +5,14 @@ import 'package:stopwatch/features/stopwatch/model/session_issue.dart';
 import 'package:stopwatch/features/stopwatch/model/stopwatch_session.dart';
 import 'package:stopwatch/features/stopwatch/model/stored_stopwatch_session.dart';
 
-final Provider<StopwatchSessionHandler> stopwatchSessionHandlerProvider =
-    Provider<StopwatchSessionHandler>(
-      (Ref ref) => StopwatchSessionHandler(
-        stopwatchSessionRepository: ref.read(
-          stopwatchSessionRepositoryProvider,
-        ),
-      ),
-    );
+final Provider<StopwatchSessionCoordinator>
+stopwatchSessionCoordinatorProvider = Provider<StopwatchSessionCoordinator>(
+  (Ref ref) => StopwatchSessionCoordinator(
+    stopwatchSessionRepository: ref.read(stopwatchSessionRepositoryProvider),
+  ),
+);
 
-class StopwatchSessionHandler {
+class StopwatchSessionCoordinator {
   final StopwatchSessionRepository _stopwatchSessionRepository;
   final DateTime Function() _currentTime;
 
@@ -54,20 +52,19 @@ class StopwatchSessionHandler {
     }
   }
 
-  Future<void> save(StoredStopwatchSession session) async {
-    try {
-      await _stopwatchSessionRepository.save(session);
-    } catch (_) {
-      throw SessionIssue.saveFailed;
-    }
+  Future<void> save(StopwatchSession session) async {
+    final StoredStopwatchSession storedStopwatchSession =
+        StoredStopwatchSession(
+          elapsed: session.elapsed,
+          savedAtUtc: _currentTime().toUtc(),
+          status: session.status,
+          laps: session.laps,
+        );
+    await _stopwatchSessionRepository.save(storedStopwatchSession);
   }
 
   Future<void> clear() async {
-    try {
-      await _stopwatchSessionRepository.clear();
-    } catch (_) {
-      throw SessionIssue.clearFailed;
-    }
+    await _stopwatchSessionRepository.clear();
   }
 
   Duration _nonNegativeDifference(DateTime later, DateTime earlier) {

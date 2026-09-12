@@ -1,11 +1,10 @@
 import 'dart:async';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:stopwatch/features/stopwatch/logic/stopwatch_session_handler.dart';
+import 'package:stopwatch/features/stopwatch/logic/stopwatch_session_coordinator.dart';
 import 'package:stopwatch/features/stopwatch/model/lap.dart';
 import 'package:stopwatch/features/stopwatch/model/session_issue.dart';
 import 'package:stopwatch/features/stopwatch/model/stopwatch_session.dart';
-import 'package:stopwatch/features/stopwatch/model/stored_stopwatch_session.dart';
 import 'package:stopwatch/features/stopwatch/model/stopwatch_status.dart';
 import 'package:stopwatch/features/stopwatch/service/stopwatch_service.dart';
 
@@ -21,12 +20,14 @@ class StopwatchNotifier extends AsyncNotifier<StopwatchState> {
   Timer? _timer;
   bool _refreshEnabled = false;
   late final StopwatchService _stopwatchService;
-  late final StopwatchSessionHandler _stopwatchSessionHandler;
+  late final StopwatchSessionCoordinator _stopwatchSessionCoordinator;
 
   @override
   Future<StopwatchState> build() async {
     _stopwatchService = ref.read(stopwatchServiceProvider);
-    _stopwatchSessionHandler = ref.read(stopwatchSessionHandlerProvider);
+    _stopwatchSessionCoordinator = ref.read(
+      stopwatchSessionCoordinatorProvider,
+    );
     ref.onDispose(() {
       stopRefreshTimer();
       _stopwatchService.stop();
@@ -132,9 +133,10 @@ class StopwatchNotifier extends AsyncNotifier<StopwatchState> {
   Future<void> clearSavedSession() async {
     await _runSessionOperation(() async {
       // Clear the current issue so a repeated failure emits a new state.
-      state = AsyncValue.data(.initial());
+      final current = state.requireValue;
+      state = AsyncValue.data(current.copyWith(sessionIssue: null));
       try {
-        await _stopwatchSessionHandler.clear();
+        await _stopwatchSessionCoordinator.clear();
         state = AsyncValue.data(.initial());
       } on SessionIssue catch (issue) {
         state = AsyncValue.data(.withIssue(issue));
@@ -160,12 +162,10 @@ class StopwatchNotifier extends AsyncNotifier<StopwatchState> {
   }
 
   Future<void> _saveToSession() async {
-    final StoredStopwatchSession session = state.requireValue.toSession(
-      savedAt: DateTime.now(),
-    );
+    final StopwatchSession session = state.requireValue.toSession();
 
     try {
-      await _stopwatchSessionHandler.save(session);
+      await _stopwatchSessionCoordinator.save(session);
 
       final StopwatchState? current = state.value;
       if (current?.sessionIssue == .saveFailed) {
@@ -181,7 +181,7 @@ class StopwatchNotifier extends AsyncNotifier<StopwatchState> {
 
   Future<StopwatchState?> _restore() async {
     try {
-      final StopwatchSession? session = await _stopwatchSessionHandler
+      final StopwatchSession? session = await _stopwatchSessionCoordinator
           .restore();
 
       if (session == null) {

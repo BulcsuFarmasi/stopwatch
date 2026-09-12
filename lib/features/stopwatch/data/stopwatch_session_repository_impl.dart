@@ -18,8 +18,13 @@ class StopwatchSessionRepositoryImpl extends StopwatchSessionRepository {
   Future<void> _pendingWrite = Future.value();
 
   @override
-  Future<void> clear() =>
-      _enqueue(() => _preferences.remove(_sharedPreferencesKey));
+  Future<void> clear() async {
+    try {
+      await _enqueue(() => _preferences.remove(_sharedPreferencesKey));
+    } catch (_) {
+      throw SessionIssue.clearFailed;
+    }
+  }
 
   @override
   Future<StoredStopwatchSession?> load() async {
@@ -51,12 +56,18 @@ class StopwatchSessionRepositoryImpl extends StopwatchSessionRepository {
   }
 
   @override
-  Future<void> save(StoredStopwatchSession session) => _enqueue(
-    () => _preferences.setString(
-      _sharedPreferencesKey,
-      json.encode(session.toJson()),
-    ),
-  );
+  Future<void> save(StoredStopwatchSession session) async {
+    try {
+      await _enqueue(
+        () => _preferences.setString(
+          _sharedPreferencesKey,
+          json.encode(session.toJson()),
+        ),
+      );
+    } catch (_) {
+      throw SessionIssue.saveFailed;
+    }
+  }
 
   Future<void> _enqueue(Future<void> Function() operation) {
     final Future<void> queuedOperation = _pendingWrite.then((_) => operation());
