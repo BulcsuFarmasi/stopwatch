@@ -104,27 +104,32 @@ void main() {
         expect(restoredSession, isNull);
       });
 
-      test("should throw invalidSavedSession if schema version is unsupported", () async {
-        final StoredStopwatchSession storedStopwatchSession =
-            StoredStopwatchSession(
-              elapsed: Duration.zero,
-              savedAtUtc: DateTime.utc(2026, 9, 12),
-              status: StopwatchStatus.running,
-              laps: [],
-              schemaVersion: 100,
-            );
+      test(
+        "should throw invalidSavedSession if schema version is unsupported",
+        () async {
+          final StoredStopwatchSession storedStopwatchSession =
+              StoredStopwatchSession(
+                elapsed: Duration.zero,
+                savedAtUtc: DateTime.utc(2026, 9, 12),
+                status: StopwatchStatus.running,
+                laps: [],
+                schemaVersion: 100,
+              );
 
-        when(
-          () => sharedPreferencesAsync.getString(
-            StopwatchSessionRepositoryImpl.sharedPreferencesKey,
-          ),
-        ).thenAnswer((_) async => json.encode(storedStopwatchSession.toJson()));
+          when(
+            () => sharedPreferencesAsync.getString(
+              StopwatchSessionRepositoryImpl.sharedPreferencesKey,
+            ),
+          ).thenAnswer(
+            (_) async => json.encode(storedStopwatchSession.toJson()),
+          );
 
-        await expectLater(
-          stopwatchSessionRepositoryImpl.load(),
-          throwsA(SessionIssue.invalidSavedSession),
-        );
-      });
+          await expectLater(
+            stopwatchSessionRepositoryImpl.load(),
+            throwsA(SessionIssue.invalidSavedSession),
+          );
+        },
+      );
       test(
         "should throw invalidSavedSession if stored data is invalid",
         () async {
