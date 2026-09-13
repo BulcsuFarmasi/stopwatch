@@ -59,8 +59,6 @@ void main() {
       stopwatchNotifier.start();
     }
 
-    ;
-
     group('start', () {
       test('should start stopwatch, when calling start', () async {
         await setUpTest();
