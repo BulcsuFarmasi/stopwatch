@@ -97,8 +97,8 @@ class StopwatchScreen extends ConsumerWidget {
     );
 
     return AppLifecycleObserver(
-      onVisible: () => notifier.startRefreshTimer(),
-      onHidden: () => notifier.stopRefreshTimer(),
+      onVisible: () => notifier.startRefresh(),
+      onHidden: () => notifier.stopRefresh(),
       child: Scaffold(
         appBar: AppBar(
           title: Text(
