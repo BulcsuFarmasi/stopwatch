@@ -1,27 +1,31 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:mocktail/mocktail.dart';
 import 'package:stopwatch/features/stopwatch/service/stopwatch_service.dart';
 import 'package:stopwatch/features/stopwatch/view/stopwatch_screen.dart';
 import 'package:stopwatch/features/stopwatch/view/widgets/lap_row.dart';
 import 'package:stopwatch/features/stopwatch/view/widgets/laps_header.dart';
 
-import '../../fake_stopwatch_service.dart';
+class MockStopwatchService extends Mock implements StopwatchService {}
 
 void main() {
   group('StopwatchScreen', () {
-    late FakeStopwatchService fakeStopwatchService;
+    late StopwatchService stopwatchService;
     const int elapsedMilliseconds = 32;
 
     setUp(() {
-      fakeStopwatchService = FakeStopwatchService();
+      stopwatchService = MockStopwatchService();
+      when(() => stopwatchService.start()).thenAnswer((_) async {});
+      when(() => stopwatchService.stop()).thenAnswer((_) async {});
+      when(() => stopwatchService.reset()).thenAnswer((_) async {});
     });
 
     Future<void> buildWidget(WidgetTester tester) async {
       await tester.pumpWidget(
         ProviderScope(
           overrides: [
-            stopwatchServiceProvider.overrideWithValue(fakeStopwatchService),
+            stopwatchServiceProvider.overrideWithValue(stopwatchService),
           ],
           child: MaterialApp(home: StopwatchScreen()),
         ),
@@ -59,11 +63,11 @@ void main() {
           await tester.tap(finder);
           await tester.pump();
 
-          expect(fakeStopwatchService.startCalls, 1);
+          verify(() => stopwatchService.start()).called(1);
 
-          fakeStopwatchService.advance(
-            Duration(milliseconds: elapsedMilliseconds),
-          );
+          when(() => stopwatchService.elapsedTime)
+              .thenReturn(Duration(milliseconds: elapsedMilliseconds));
+
           await tester.pump(Duration(milliseconds: elapsedMilliseconds));
 
           expect(find.text("00:00.032"), findsOneWidget);
@@ -90,9 +94,9 @@ void main() {
           await tester.tap(finder);
           await tester.pump();
 
-          fakeStopwatchService.advance(
-            Duration(milliseconds: elapsedMilliseconds),
-          );
+          when(() => stopwatchService.elapsedTime)
+              .thenReturn(Duration(milliseconds: elapsedMilliseconds));
+
           await tester.pump(Duration(milliseconds: elapsedMilliseconds));
 
           expect(find.text("00:00.032"), findsOneWidget);
@@ -104,7 +108,7 @@ void main() {
           await tester.tap(finder);
           await tester.pump();
 
-          expect(fakeStopwatchService.stopCalls, 1);
+          verify(() => stopwatchService.stop()).called(1);
 
           await tester.pump(Duration(milliseconds: elapsedMilliseconds));
 
@@ -124,9 +128,8 @@ void main() {
           await tester.tap(finder);
           await tester.pump();
 
-          fakeStopwatchService.advance(
-            Duration(milliseconds: elapsedMilliseconds),
-          );
+          when(() => stopwatchService.elapsedTime)
+              .thenReturn(Duration(milliseconds: elapsedMilliseconds));
           await tester.pump(Duration(milliseconds: elapsedMilliseconds));
 
           finder = find.widgetWithText(FilledButton, 'Pause');
@@ -139,11 +142,10 @@ void main() {
           await tester.tap(finder);
           await tester.pump();
 
-          expect(fakeStopwatchService.startCalls, 2);
+          verify(() => stopwatchService.start()).called(2);
 
-          fakeStopwatchService.advance(
-            Duration(milliseconds: elapsedMilliseconds),
-          );
+          when(() => stopwatchService.elapsedTime)
+              .thenReturn(Duration(milliseconds: elapsedMilliseconds * 2));
           await tester.pump(Duration(milliseconds: elapsedMilliseconds));
 
           expect(find.text("00:00.064"), findsOneWidget);
@@ -194,9 +196,9 @@ void main() {
           await tester.tap(finder);
           await tester.pump();
 
-          fakeStopwatchService.advance(
-            Duration(milliseconds: elapsedMilliseconds),
-          );
+          when(() => stopwatchService.elapsedTime)
+              .thenReturn(Duration(milliseconds: elapsedMilliseconds));
+
           await tester.pump(Duration(milliseconds: elapsedMilliseconds));
 
           expect(find.text("00:00.032"), findsOneWidget);
@@ -208,7 +210,7 @@ void main() {
           await tester.tap(finder);
           await tester.pump();
 
-          expect(fakeStopwatchService.resetCalls, 1);
+          verify(() => stopwatchService.reset()).called(1);
 
           expect(find.text("00:00.000"), findsOneWidget);
 
@@ -271,9 +273,8 @@ void main() {
 
         expectButtonEnabled(tester, "Lap");
 
-        fakeStopwatchService.advance(
-          Duration(milliseconds: elapsedMilliseconds),
-        );
+        when(() => stopwatchService.elapsedTime)
+            .thenReturn(Duration(milliseconds: elapsedMilliseconds));
 
         finder = find.widgetWithText(FilledButton, "Lap");
 
@@ -304,18 +305,16 @@ void main() {
 
         expectButtonEnabled(tester, "Lap");
 
-        fakeStopwatchService.advance(
-          Duration(milliseconds: elapsedMilliseconds),
-        );
+        when(() => stopwatchService.elapsedTime)
+            .thenReturn(Duration(milliseconds: elapsedMilliseconds));
 
         finder = find.widgetWithText(FilledButton, "Lap");
 
         await tester.tap(finder);
         await tester.pump();
 
-        fakeStopwatchService.advance(
-          Duration(milliseconds: elapsedMilliseconds),
-        );
+        when(() => stopwatchService.elapsedTime)
+            .thenReturn(Duration(milliseconds: elapsedMilliseconds * 2));
 
         await tester.tap(finder);
         await tester.pump();
@@ -360,9 +359,8 @@ void main() {
         await tester.tap(finder);
         await tester.pump();
 
-        fakeStopwatchService.advance(
-          Duration(milliseconds: elapsedMilliseconds),
-        );
+        when(() => stopwatchService.elapsedTime)
+            .thenReturn(Duration(milliseconds: elapsedMilliseconds));
 
         finder = find.widgetWithText(FilledButton, "Lap");
 
@@ -385,9 +383,8 @@ void main() {
         await tester.tap(finder);
         await tester.pump();
 
-        fakeStopwatchService.advance(
-          Duration(milliseconds: elapsedMilliseconds),
-        );
+        when(() => stopwatchService.elapsedTime)
+            .thenReturn(Duration(milliseconds: elapsedMilliseconds));
 
         finder = find.widgetWithText(FilledButton, "Lap");
 
@@ -433,9 +430,8 @@ void main() {
           await tester.tap(finder);
           await tester.pump();
 
-          fakeStopwatchService.advance(
-            Duration(milliseconds: elapsedMilliseconds),
-          );
+          when(() => stopwatchService.elapsedTime)
+              .thenReturn(Duration(milliseconds: elapsedMilliseconds));
 
           finder = find.widgetWithText(FilledButton, "Lap");
 
