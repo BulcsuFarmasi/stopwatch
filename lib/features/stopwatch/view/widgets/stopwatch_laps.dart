@@ -26,6 +26,7 @@ class StopwatchLaps extends ConsumerWidget {
     final StopwatchNotifier notifier = ref.read(
       stopwatchNotifierProvider.notifier,
     );
+
     return Column(
       children: [
         if (state.laps.isNotEmpty) LapsHeader(),

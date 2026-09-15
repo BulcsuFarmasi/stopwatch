@@ -21,8 +21,7 @@ abstract final class AppStrings {
   static const String lapsSplit = "Split";
   static const String lapsTotal = "Total";
   static const String clearLaps = "Clear laps";
-  static const String lapsHeaderSemantics =
-      "Laps. Columns: number, split, total";
+  static const String lapsHeaderSemantics = "Laps. Columns: Lap, Split, Total";
 
   // Errors
   static const String errorInvalidSession =

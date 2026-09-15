@@ -2,86 +2,120 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:mocktail/mocktail.dart';
 import 'package:stopwatch/features/stopwatch/logic/stopwatch_notifier.dart';
-import 'package:stopwatch/features/stopwatch/service/stopwatch_service.dart';
+import 'package:stopwatch/features/stopwatch/view/widgets/analog_clock.dart';
+import 'package:stopwatch/features/stopwatch/view/widgets/digital_clock.dart';
 import 'package:stopwatch/features/stopwatch/view/widgets/stopwatch_display.dart';
 
-import '../../../fake_stopwatch_service.dart';
+import '../../mock_stopwatch_notifier.dart';
 
 void main() {
   group('StopwatchDisplay', () {
-    late FakeStopwatchService fakeStopwatchService;
-    late ProviderContainer container;
-    late StopwatchNotifier stopwatchNotifier;
-    final int elapsedMilliseconds = 62003;
+    late MockStopwatchNotifier stopwatchNotifier;
+    const Duration elapsed = Duration(minutes: 1, seconds: 2, milliseconds: 3);
 
-    setUp(() {
-      fakeStopwatchService = FakeStopwatchService();
-      container = ProviderContainer.test(
-        overrides: [
-          stopwatchServiceProvider.overrideWithValue(fakeStopwatchService),
-        ],
-      );
-      stopwatchNotifier = container.read(stopwatchNotifierProvider.notifier);
-    });
+    Future<void> buildWidget(
+      WidgetTester tester, {
+      StopwatchState? stopwatchState,
+    }) async {
+      stopwatchNotifier = MockStopwatchNotifier();
+      when(() => stopwatchNotifier.build())
+          .thenAnswer((_) async => stopwatchState ?? StopwatchState.initial());
 
-    Future<void> buildWidget(WidgetTester tester) async {
       await tester.pumpWidget(
-        UncontrolledProviderScope(
-          container: container,
+        ProviderScope(
+          overrides: [
+            stopwatchNotifierProvider.overrideWith(() => stopwatchNotifier),
+          ],
           child: MaterialApp(home: StopwatchDisplay()),
         ),
       );
+      await tester.pump();
     }
 
-    testWidgets("should have the intial correct semantics label", (
-      WidgetTester tester,
-    ) async {
-      await buildWidget(tester);
+    group("Semantics", () {
+      testWidgets("should have the initial correct semantics label", (
+        WidgetTester tester,
+      ) async {
+        await buildWidget(tester);
 
-      expect(
-        find.bySemanticsLabel(
-          "Elapsed time: 0 minutes, 0 seconds, 0 milliseconds",
-        ),
-        findsOneWidget,
+        expect(
+          find.bySemanticsLabel(
+            "Elapsed time: 0 minutes, 0 seconds, 0 milliseconds",
+          ),
+          findsOneWidget,
+        );
+      });
+
+      testWidgets(
+        "should have the correct semantics label after elapsed time",
+        (WidgetTester tester) async {
+          await buildWidget(
+            tester,
+            stopwatchState: StopwatchState.initial().copyWith(elapsed: elapsed),
+          );
+
+          expect(
+            find.bySemanticsLabel(
+              "Elapsed time: 1 minute, 2 seconds, 3 milliseconds",
+            ),
+            findsOneWidget,
+          );
+        },
       );
+
+      testWidgets('does not expose the elapsed-time display as a live region', (
+        WidgetTester tester,
+      ) async {
+        await buildWidget(tester);
+
+        final SemanticsHandle handle = tester.ensureSemantics();
+
+        try {
+          final SemanticsData semantics = tester
+              .getSemantics(find.byType(StopwatchDisplay))
+              .getSemanticsData();
+
+          expect(semantics.flagsCollection.isLiveRegion, isFalse);
+        } finally {
+          handle.dispose();
+        }
+      });
     });
 
-    testWidgets("should have the correct semantics label after elapsed time", (
-      WidgetTester tester,
-    ) async {
-      await buildWidget(tester);
+    group("AnalogClock", () {
+      testWidgets("should display the analog clock with the correct value", (
+        WidgetTester tester,
+      ) async {
+        await buildWidget(
+          tester,
+          stopwatchState: StopwatchState.initial().copyWith(elapsed: elapsed),
+        );
 
-      stopwatchNotifier.start();
+        final AnalogClock analogClock = tester.widget<AnalogClock>(
+          find.byType(AnalogClock),
+        );
 
-      fakeStopwatchService.advance(Duration(milliseconds: elapsedMilliseconds));
-
-      await tester.pump(Duration(milliseconds: 32));
-
-      stopwatchNotifier.pause();
-
-      expect(
-        find.bySemanticsLabel(
-          "Elapsed time: 1 minute, 2 seconds, 3 milliseconds",
-        ),
-        findsOneWidget,
-      );
+        expect(analogClock.elapsed, elapsed);
+      });
     });
 
-    testWidgets('does not expose the elapsed-time display as a live region', (
-      WidgetTester tester,
-    ) async {
-      await buildWidget(tester);
+    group("DigitalClock", () {
+      testWidgets("should display the digital clock with the correct value", (
+        WidgetTester tester,
+      ) async {
+        await buildWidget(
+          tester,
+          stopwatchState: StopwatchState.initial().copyWith(elapsed: elapsed),
+        );
 
-      final SemanticsHandle handle = tester.ensureSemantics();
+        final DigitalClock digitalClock = tester.widget<DigitalClock>(
+          find.byType(DigitalClock),
+        );
 
-      final SemanticsData semantics = tester
-          .getSemantics(find.byType(StopwatchDisplay))
-          .getSemanticsData();
-
-      expect(semantics.flagsCollection.isLiveRegion, isFalse);
-
-      handle.dispose();
+        expect(digitalClock.elapsed, elapsed);
+      });
     });
   });
 }

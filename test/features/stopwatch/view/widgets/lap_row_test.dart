@@ -27,5 +27,21 @@ void main() {
         findsOneWidget,
       );
     });
+
+    testWidgets("should display the correct texts", (
+      WidgetTester tester,
+    ) async {
+      final Lap lap = Lap(
+        number: 2,
+        split: Duration(milliseconds: 32),
+        total: Duration(milliseconds: 64),
+      );
+
+      await buildWidget(tester, lap);
+
+      expect(find.text("2"), findsOneWidget);
+      expect(find.text("00:00.032"), findsOneWidget);
+      expect(find.text("00:00.064"), findsOneWidget);
+    });
   });
 }

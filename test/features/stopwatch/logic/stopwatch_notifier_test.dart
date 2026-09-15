@@ -201,6 +201,8 @@ void main() {
       test('should start stopwatch, when calling start', () async {
         await setUpTest();
         when(() => stopwatchService.start()).thenReturn(null);
+        when(() => stopwatchSessionCoordinator.save(any()))
+            .thenAnswer((_) async {});
         stopwatchNotifier.start();
 
         when(() => stopwatchService.elapsedTime)
@@ -351,6 +353,9 @@ void main() {
           ),
         );
 
+        when(() => stopwatchSessionCoordinator.save(any()))
+            .thenAnswer((_) async {});
+
         when(() => stopwatchService.elapsedTime)
             .thenReturn(Duration(milliseconds: elapsedMilliseconds));
 
@@ -434,6 +439,9 @@ void main() {
           ),
         );
 
+        when(() => stopwatchSessionCoordinator.save(any()))
+            .thenAnswer((_) async {});
+
         when(() => stopwatchService.elapsedTime)
             .thenReturn(Duration(milliseconds: elapsedMilliseconds));
 
@@ -478,6 +486,9 @@ void main() {
             ],
           ),
         );
+
+        when(() => stopwatchSessionCoordinator.save(any()))
+            .thenAnswer((_) async {});
 
         when(() => stopwatchService.elapsedTime)
             .thenReturn(Duration(milliseconds: elapsedMilliseconds * 2));
@@ -555,6 +566,9 @@ void main() {
             ],
           ),
         );
+
+        when(() => stopwatchSessionCoordinator.save(any()))
+            .thenAnswer((_) async {});
 
         when(() => stopwatchService.elapsedTime)
             .thenReturn(Duration(milliseconds: 40));

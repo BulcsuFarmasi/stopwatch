@@ -14,9 +14,21 @@ void main() {
       await buildWidget(tester);
 
       expect(
-        find.bySemanticsLabel("Laps. Columns: number, split, total"),
+        find.bySemanticsLabel("Laps. Columns: Lap, Split, Total"),
         findsOneWidget,
       );
+    });
+
+    testWidgets("should have the correct header titles", (
+      WidgetTester tester,
+    ) async {
+      await buildWidget(tester);
+
+      expect(find.text("Lap"), findsOneWidget);
+
+      expect(find.text("Split"), findsOneWidget);
+
+      expect(find.text("Total"), findsOneWidget);
     });
   });
 }
