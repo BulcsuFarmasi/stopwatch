@@ -66,6 +66,9 @@ void main() {
     expect(findButton("Start"), findsOneWidget);
   });
 
+  
+  }
+
   Finder findButton(String label) => find.widgetWithText(FilledButton, label);
 
   Duration getElapsedTime(WidgetTester tester) =>
@@ -76,5 +79,4 @@ void main() {
       () => Future<void>.delayed(const Duration(milliseconds: 320)),
     );
     await tester.pump();
-  }
 }
