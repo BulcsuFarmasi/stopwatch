@@ -36,7 +36,7 @@ class StopwatchControls extends StatelessWidget {
             mainAxisSize: MainAxisSize.min,
             mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.stretch,
-            spacing: StopwatchConstants.compactSpacing,
+            spacing: StopwatchConstants.compactSpacing / 2,
             children: [
               StartButton(),
               PauseResumeButton(),
