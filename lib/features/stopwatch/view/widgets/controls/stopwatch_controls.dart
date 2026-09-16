@@ -11,6 +11,15 @@ class StopwatchControls extends StatelessWidget {
 
   final bool useCompactLayout;
 
+  @visibleForTesting
+  static const landscapeKey = Key("stopwatchControlsLandscape");
+
+  @visibleForTesting
+  static const compactKey = Key("stopwatchControlsCompact");
+
+  @visibleForTesting
+  static const regularKey = Key("stopwatchControlsRegular");
+
   @override
   Widget build(BuildContext context) {
     return LayoutBuilder(
@@ -23,6 +32,7 @@ class StopwatchControls extends StatelessWidget {
 
         if (landscape) {
           return Column(
+            key: landscapeKey,
             mainAxisSize: MainAxisSize.min,
             mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -38,6 +48,7 @@ class StopwatchControls extends StatelessWidget {
 
         if (compact) {
           return Padding(
+            key: compactKey,
             padding: EdgeInsetsGeometry.symmetric(horizontal: 10),
             child: Column(
               mainAxisSize: MainAxisSize.min,
@@ -64,6 +75,7 @@ class StopwatchControls extends StatelessWidget {
         }
 
         return Padding(
+          key: regularKey,
           padding: EdgeInsets.symmetric(
             horizontal: constraints.maxWidth < StopwatchConstants.baseWidth
                 ? 10
