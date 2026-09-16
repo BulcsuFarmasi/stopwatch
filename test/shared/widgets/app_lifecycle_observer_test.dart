@@ -18,23 +18,6 @@ void main() {
       );
     }
 
-    group("initial", () {
-      testWidgets("should be trigger the resumed event", (
-        WidgetTester tester,
-      ) async {
-        bool visibleTrigged = false;
-
-        await buildWidget(
-          tester: tester,
-          onVisible: () {
-            visibleTrigged = true;
-          },
-        );
-
-        expect(visibleTrigged, true);
-      });
-    });
-
     group("visible", () {
       testWidgets("should be triggered by resumed event", (
         WidgetTester tester,

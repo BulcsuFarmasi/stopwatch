@@ -28,11 +28,11 @@ abstract final class AppStrings {
       "We couldn't recover your stopwatch session, so we started a new one.";
   static const String errorReadFailedTitle = "Read error";
   static const String errorReadFailedDescription =
-      "We couldn't read your stopwatch session. Please try again or discard it";
+      "We couldn't read your stopwatch session. Please try again or discard it.";
   static const String errorReadFailedDiscard = "Discard";
   static const String errorClearFailedTitle = "Clear error";
   static const String errorClearFailedDescription =
-      "We couldn't clear your stopwatch session. Please try again";
+      "We couldn't clear your stopwatch session. Please try again.";
   static const String errorSaveFailed =
       "We couldn't save your stopwatch session. Your latest changes may not be restored.";
   static const String errorTryAgain = "Try again";
