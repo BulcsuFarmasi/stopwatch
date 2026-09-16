@@ -3,8 +3,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:stopwatch/shared/widgets/app_lifecycle_observer.dart';
 import 'package:stopwatch/features/stopwatch/logic/stopwatch_notifier.dart';
 import 'package:stopwatch/features/stopwatch/model/session_issue.dart';
-import 'package:stopwatch/features/stopwatch/view/widgets/stopwatch_landscape.dart';
-import 'package:stopwatch/features/stopwatch/view/widgets/stopwatch_portrait.dart';
+import 'package:stopwatch/features/stopwatch/view/widgets/layout/stopwatch_landscape.dart';
+import 'package:stopwatch/features/stopwatch/view/widgets/layout/stopwatch_portrait.dart';
 import 'package:stopwatch/l10n/app_strings.dart';
 import 'package:stopwatch/shared/widgets/stopwatch_alert_dialog.dart';
 

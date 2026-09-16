@@ -4,11 +4,11 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:stopwatch/features/stopwatch/logic/stopwatch_notifier.dart';
-import 'package:stopwatch/features/stopwatch/view/widgets/analog_clock.dart';
-import 'package:stopwatch/features/stopwatch/view/widgets/digital_clock.dart';
-import 'package:stopwatch/features/stopwatch/view/widgets/stopwatch_display.dart';
+import 'package:stopwatch/features/stopwatch/view/widgets/display/analog_clock.dart';
+import 'package:stopwatch/features/stopwatch/view/widgets/display/digital_clock.dart';
+import 'package:stopwatch/features/stopwatch/view/widgets/display/stopwatch_display.dart';
 
-import '../../mock_stopwatch_notifier.dart';
+import '../../../mock_stopwatch_notifier.dart';
 
 void main() {
   group('StopwatchDisplay', () {

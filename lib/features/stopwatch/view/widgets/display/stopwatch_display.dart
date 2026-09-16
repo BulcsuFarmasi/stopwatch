@@ -5,8 +5,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:stopwatch/features/stopwatch/logic/stopwatch_notifier.dart';
 import 'package:stopwatch/features/stopwatch/view/constants/stopwatch_constants.dart';
 import 'package:stopwatch/features/stopwatch/view/formatters/format_duration.dart';
-import 'package:stopwatch/features/stopwatch/view/widgets/analog_clock.dart';
-import 'package:stopwatch/features/stopwatch/view/widgets/digital_clock.dart';
+import 'package:stopwatch/features/stopwatch/view/widgets/display/analog_clock.dart';
+import 'package:stopwatch/features/stopwatch/view/widgets/display/digital_clock.dart';
 import 'package:stopwatch/l10n/app_strings.dart';
 
 class StopwatchDisplay extends StatelessWidget {

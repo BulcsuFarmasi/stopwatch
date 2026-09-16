@@ -4,8 +4,8 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:stopwatch/features/stopwatch/service/stopwatch_service.dart';
 import 'package:stopwatch/features/stopwatch/view/stopwatch_screen.dart';
-import 'package:stopwatch/features/stopwatch/view/widgets/lap_row.dart';
-import 'package:stopwatch/features/stopwatch/view/widgets/laps_header.dart';
+import 'package:stopwatch/features/stopwatch/view/widgets/laps/lap_row.dart';
+import 'package:stopwatch/features/stopwatch/view/widgets/laps/laps_header.dart';
 
 class MockStopwatchService extends Mock implements StopwatchService {}
 

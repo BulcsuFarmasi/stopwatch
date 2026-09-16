@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:stopwatch/features/stopwatch/view/widgets/digital_clock.dart';
+import 'package:stopwatch/features/stopwatch/view/widgets/display/digital_clock.dart';
 
 void main() {
   group("DigitalClock", () {

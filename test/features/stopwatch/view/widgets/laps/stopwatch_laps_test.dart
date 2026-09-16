@@ -4,12 +4,12 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:stopwatch/features/stopwatch/logic/stopwatch_notifier.dart';
 import 'package:stopwatch/features/stopwatch/model/lap.dart';
-import 'package:stopwatch/features/stopwatch/model/session_issue.dart';
-import 'package:stopwatch/features/stopwatch/view/widgets/lap_row.dart';
-import 'package:stopwatch/features/stopwatch/view/widgets/laps_header.dart';
-import 'package:stopwatch/features/stopwatch/view/widgets/stopwatch_laps.dart';
+import 'package:stopwatch/features/stopwatch/view/widgets/laps/clear_laps_button.dart';
+import 'package:stopwatch/features/stopwatch/view/widgets/laps/lap_row.dart';
+import 'package:stopwatch/features/stopwatch/view/widgets/laps/laps_header.dart';
+import 'package:stopwatch/features/stopwatch/view/widgets/laps/stopwatch_laps.dart';
 
-import '../../mock_stopwatch_notifier.dart';
+import '../../../mock_stopwatch_notifier.dart';
 
 void main() {
   group("StopwatchLaps", () {
@@ -102,7 +102,7 @@ void main() {
       ) async {
         await buildWidget(tester);
 
-        expect(find.widgetWithText(OutlinedButton, "Clear laps"), findsNothing);
+        expect(find.byType(ClearLapsButton), findsNothing);
       });
 
       testWidgets("should display clear laps button if there are laps", (
@@ -113,60 +113,7 @@ void main() {
           stopwatchState: StopwatchState.initial().copyWith(laps: laps),
         );
 
-        expect(
-          find.widgetWithText(OutlinedButton, "Clear laps"),
-          findsOneWidget,
-        );
-      });
-
-      testWidgets("should be disabled if actions are blocked", (
-        WidgetTester tester,
-      ) async {
-        await buildWidget(
-          tester,
-          stopwatchState: StopwatchState.initial().copyWith(
-            laps: laps,
-            sessionIssue: SessionIssue.clearFailed,
-          ),
-        );
-
-        final OutlinedButton outlinedButton = tester.widget<OutlinedButton>(
-          find.widgetWithText(OutlinedButton, "Clear laps"),
-        );
-
-        expect(outlinedButton.onPressed, isNull);
-      });
-
-      testWidgets("should be enabled if actions are not blocked", (
-        WidgetTester tester,
-      ) async {
-        await buildWidget(
-          tester,
-          stopwatchState: StopwatchState.initial().copyWith(laps: laps),
-        );
-
-        final OutlinedButton outlinedButton = tester.widget<OutlinedButton>(
-          find.widgetWithText(OutlinedButton, "Clear laps"),
-        );
-
-        expect(outlinedButton.onPressed, isNotNull);
-      });
-
-      testWidgets("should call notifier if enabled and pressed", (
-        WidgetTester tester,
-      ) async {
-        await buildWidget(
-          tester,
-          stopwatchState: StopwatchState.initial().copyWith(laps: laps),
-        );
-
-        when(() => stopwatchNotifier.clearLaps()).thenReturn(null);
-
-        await tester.tap(find.widgetWithText(OutlinedButton, "Clear laps"));
-
-        await tester.pump();
-
-        verify(() => stopwatchNotifier.clearLaps()).called(1);
+        expect(find.byType(ClearLapsButton), findsOneWidget);
       });
     });
   });

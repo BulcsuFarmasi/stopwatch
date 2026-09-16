@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:stopwatch/features/stopwatch/view/widgets/analog_clock.dart';
-import 'package:stopwatch/features/stopwatch/view/widgets/analog_clock_face_painter.dart';
-import 'package:stopwatch/features/stopwatch/view/widgets/analog_clock_hands_painter.dart';
+import 'package:stopwatch/features/stopwatch/view/widgets/display/analog_clock.dart';
+import 'package:stopwatch/features/stopwatch/view/widgets/display/analog_clock_face_painter.dart';
+import 'package:stopwatch/features/stopwatch/view/widgets/display/analog_clock_hands_painter.dart';
 
 void main() {
   group("AnalogClock", () {

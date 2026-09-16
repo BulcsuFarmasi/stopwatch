@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:stopwatch/features/stopwatch/view/constants/stopwatch_constants.dart';
-import 'package:stopwatch/features/stopwatch/view/widgets/stopwatch_controls.dart';
-import 'package:stopwatch/features/stopwatch/view/widgets/stopwatch_display.dart';
-import 'package:stopwatch/features/stopwatch/view/widgets/stopwatch_laps.dart';
+import 'package:stopwatch/features/stopwatch/view/widgets/controls/stopwatch_controls.dart';
+import 'package:stopwatch/features/stopwatch/view/widgets/display/stopwatch_display.dart';
+import 'package:stopwatch/features/stopwatch/view/widgets/laps/stopwatch_laps.dart';
 
 class StopwatchPortrait extends StatelessWidget {
   const new({super.key});

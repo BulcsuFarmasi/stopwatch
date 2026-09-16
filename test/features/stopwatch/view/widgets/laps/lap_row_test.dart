@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:stopwatch/features/stopwatch/model/lap.dart';
-import 'package:stopwatch/features/stopwatch/view/widgets/lap_row.dart';
+import 'package:stopwatch/features/stopwatch/view/widgets/laps/lap_row.dart';
 
 void main() {
   group('LapRow', () {
