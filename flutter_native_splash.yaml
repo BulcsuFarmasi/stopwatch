@@ -1,0 +1,10 @@
+flutter_native_splash:
+  color: "#004D43"
+  image: assets/images/stopwatch_foreground.png
+  android: true
+  ios: true
+  web: true
+  android_12:
+    color: "#004D43"
+    image: assets/images/stopwatch_splash_android12.png
+    icon_background_color: "#004D43"
