@@ -1,54 +1,116 @@
 import 'package:flutter/material.dart';
-import 'package:stopwatch/features/stopwatch/view/constants/stopwatch_constants.dart';
-import 'package:stopwatch/features/stopwatch/view/widgets/stopwatch_controls.dart';
-import 'package:stopwatch/features/stopwatch/view/widgets/stopwatch_display.dart';
-import 'package:stopwatch/features/stopwatch/view/widgets/stopwatch_laps.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:stopwatch/shared/widgets/app_lifecycle_observer.dart';
+import 'package:stopwatch/features/stopwatch/logic/stopwatch_notifier.dart';
+import 'package:stopwatch/features/stopwatch/model/session_issue.dart';
+import 'package:stopwatch/features/stopwatch/view/widgets/layout/stopwatch_landscape.dart';
+import 'package:stopwatch/features/stopwatch/view/widgets/layout/stopwatch_portrait.dart';
+import 'package:stopwatch/l10n/app_strings.dart';
+import 'package:stopwatch/shared/widgets/stopwatch_alert_dialog.dart';
 
-class StopwatchScreen extends StatelessWidget {
-  const new({super.key});
+class StopwatchScreen extends ConsumerWidget {
+  const StopwatchScreen({super.key});
+
+  void displaySnackbar(BuildContext context, String contentText) {
+    ScaffoldMessenger.of(context)
+        .showSnackBar(SnackBar(content: Text(contentText)));
+  }
+
+  void displayReadFailedAlert(BuildContext context, WidgetRef ref) {
+    final StopwatchNotifier notifier = ref.read(
+      stopwatchNotifierProvider.notifier,
+    );
+
+    showStopwatchAlertDialog(
+      context,
+      StopwatchAlertDialog(
+        title: AppStrings.errorReadFailedTitle,
+        description: AppStrings.errorReadFailedDescription,
+        actions: [
+          TextButton(
+            onPressed: () async {
+              Navigator.of(context).pop();
+              await notifier.clearSavedSession();
+            },
+            child: Text(AppStrings.errorReadFailedDiscard),
+          ),
+          TextButton(
+            onPressed: () async {
+              Navigator.of(context).pop();
+              await notifier.retrySessionRestore();
+            },
+            child: Text(AppStrings.errorTryAgain),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void displayClearFailedAlert(BuildContext context, WidgetRef ref) {
+    final StopwatchNotifier notifier = ref.read(
+      stopwatchNotifierProvider.notifier,
+    );
+
+    showStopwatchAlertDialog(
+      context,
+      StopwatchAlertDialog(
+        title: AppStrings.errorClearFailedTitle,
+        description: AppStrings.errorClearFailedDescription,
+        actions: [
+          TextButton(
+            onPressed: () async {
+              Navigator.of(context).pop();
+              await notifier.clearSavedSession();
+            },
+            child: Text(AppStrings.errorTryAgain),
+          ),
+        ],
+      ),
+    );
+  }
 
   @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(
-          "Stopwatch",
-          style: Theme.of(context).textTheme.headlineMedium,
-        ),
-      ),
-      body: SafeArea(
-        top: false,
-        child: LayoutBuilder(
-          builder: (BuildContext context, BoxConstraints constraints) {
-            final bool compactHeight =
-                constraints.maxHeight <
-                StopwatchConstants.compactHeightBreakpoint;
+  Widget build(BuildContext context, WidgetRef ref) {
+    final StopwatchNotifier notifier = ref.read(
+      stopwatchNotifierProvider.notifier,
+    );
 
-            return Center(
-              child: ConstrainedBox(
-                constraints: BoxConstraints(
-                  maxWidth: StopwatchConstants.baseWidth,
-                ),
-                child: Padding(
-                  padding: EdgeInsets.symmetric(
-                    vertical: compactHeight
-                        ? StopwatchConstants.compactVerticalPadding
-                        : StopwatchConstants.baseVerticalPadding,
-                  ),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.spaceAround,
-                    spacing: compactHeight
-                        ? StopwatchConstants.compactVerticalSpacing
-                        : StopwatchConstants.baseVerticalSpacing,
-                    children: [
-                      Flexible(child: StopwatchDisplay()),
-                      Expanded(child: StopwatchLaps()),
-                      StopwatchControls(useCompactLayout: compactHeight),
-                    ],
-                  ),
-                ),
-              ),
-            );
+    ref.listen(
+      stopwatchNotifierProvider.select((state) => state.value?.sessionIssue),
+      (_, SessionIssue? next) {
+        switch (next) {
+          case .invalidSavedSession:
+            displaySnackbar(context, AppStrings.errorInvalidSession);
+            notifier.acknowledgeInvalidSavedSession();
+            break;
+          case .readFailed:
+            displayReadFailedAlert(context, ref);
+            break;
+          case .clearFailed:
+            displayClearFailedAlert(context, ref);
+            break;
+          case .saveFailed:
+            displaySnackbar(context, AppStrings.errorSaveFailed);
+          default:
+        }
+      },
+    );
+
+    return AppLifecycleObserver(
+      onVisible: () => notifier.startRefresh(),
+      onHidden: () => notifier.stopRefresh(),
+      child: Scaffold(
+        appBar: AppBar(
+          title: Text(
+            AppStrings.appTitle,
+            style: Theme.of(context).textTheme.headlineMedium,
+          ),
+        ),
+        body: SafeArea(
+          top: false,
+          child: switch (MediaQuery.orientationOf(context)) {
+            .portrait => StopwatchPortrait(),
+            .landscape => StopwatchLandscape(),
           },
         ),
       ),

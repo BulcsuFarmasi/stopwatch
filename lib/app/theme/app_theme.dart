@@ -15,19 +15,41 @@ final ThemeData appTheme = ThemeData(
     centerTitle: true,
   ),
   filledButtonTheme: FilledButtonThemeData(
-    style: ButtonStyle(
-      shape: WidgetStatePropertyAll(
-        RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-      ),
-    ),
+    style:
+        FilledButton.styleFrom(
+          backgroundColor: AppColors.primary,
+          foregroundColor: AppColors.onPrimary,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(10),
+          ),
+        ).copyWith(
+          side: WidgetStateProperty.resolveWith<BorderSide?>((states) {
+            if (states.contains(WidgetState.focused)) {
+              return BorderSide(color: AppColors.onPrimary, width: 3);
+            }
+            return null;
+          }),
+        ),
   ),
   outlinedButtonTheme: OutlinedButtonThemeData(
-    style: ButtonStyle(
-      foregroundColor: WidgetStatePropertyAll(AppColors.secondary),
-      side: WidgetStatePropertyAll(BorderSide(color: AppColors.secondary)),
-      shape: WidgetStatePropertyAll(
-        RoundedRectangleBorder(borderRadius: BorderRadiusGeometry.circular(10)),
-      ),
-    ),
+    style:
+        OutlinedButton.styleFrom(
+          foregroundColor: AppColors.primary,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(10),
+          ),
+        ).copyWith(
+          side: WidgetStateProperty.resolveWith<BorderSide?>((states) {
+            if (states.contains(WidgetState.disabled)) {
+              return null;
+            }
+
+            final bool focused = states.contains(WidgetState.focused);
+            return BorderSide(
+              color: focused ? AppColors.text : AppColors.primary,
+              width: focused ? 3 : 1,
+            );
+          }),
+        ),
   ),
 );

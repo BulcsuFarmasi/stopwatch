@@ -1,409 +1,363 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:stopwatch/features/stopwatch/service/stopwatch_service.dart';
+import 'package:mocktail/mocktail.dart';
+import 'package:stopwatch/features/stopwatch/logic/stopwatch_notifier.dart';
+import 'package:stopwatch/features/stopwatch/model/lap.dart';
 import 'package:stopwatch/features/stopwatch/view/stopwatch_screen.dart';
-import 'package:stopwatch/features/stopwatch/view/widgets/lap_row.dart';
-import 'package:stopwatch/features/stopwatch/view/widgets/laps_header.dart';
+import 'package:stopwatch/features/stopwatch/view/widgets/layout/stopwatch_landscape.dart';
+import 'package:stopwatch/features/stopwatch/view/widgets/layout/stopwatch_portrait.dart';
+import 'package:stopwatch/shared/widgets/app_lifecycle_observer.dart';
+import 'package:stopwatch/shared/widgets/stopwatch_alert_dialog.dart';
 
-import '../../fake_stopwatch_service.dart';
+import '../mock_stopwatch_notifier.dart';
 
 void main() {
-  group('StopwatchScreen', () {
-    late FakeStopwatchService fakeStopwatchService;
-    const int elapsedMilliseconds = 32;
+  group("StopwatchScreen", () {
+    late MockStopwatchNotifier stopwatchNotifier;
 
-    setUp(() {
-      fakeStopwatchService = FakeStopwatchService();
-    });
+    Future<void> buildWidget(
+      WidgetTester tester, {
+      StopwatchState? stopwatchState,
+      Size size = const Size(600, 800),
+      double textScale = 1,
+    }) async {
+      tester.view.devicePixelRatio = 1;
+      tester.view.physicalSize = size;
 
-    Future<void> buildWidget(WidgetTester tester) async {
+      addTearDown(() {
+        tester.view.resetPhysicalSize();
+        tester.view.resetDevicePixelRatio();
+      });
+
+      stopwatchNotifier = MockStopwatchNotifier();
+
+      when(() => stopwatchNotifier.build())
+          .thenAnswer((_) async => stopwatchState ?? StopwatchState.initial());
+
       await tester.pumpWidget(
         ProviderScope(
           overrides: [
-            stopwatchServiceProvider.overrideWithValue(fakeStopwatchService),
+            stopwatchNotifierProvider.overrideWith(() => stopwatchNotifier),
           ],
-          child: MaterialApp(home: StopwatchScreen()),
+          child: MaterialApp(
+            builder: (BuildContext context, Widget? child) {
+              return MediaQuery(
+                data: MediaQuery.of(context)
+                    .copyWith(textScaler: TextScaler.linear(textScale)),
+                child: child!,
+              );
+            },
+            home: StopwatchScreen(),
+          ),
         ),
       );
+
+      await tester.pump();
     }
 
-    void expectButtonEnabled(WidgetTester tester, String label) {
-      final Finder finder = find.widgetWithText(FilledButton, label);
-
-      expect(finder, findsOneWidget);
-      expect(tester.widget<FilledButton>(finder).onPressed, isNotNull);
-    }
-
-    void expectButtonDisabled(WidgetTester tester, String label) {
-      final Finder finder = find.widgetWithText(FilledButton, label);
-
-      expect(finder, findsOneWidget);
-      expect(tester.widget<FilledButton>(finder).onPressed, isNull);
-    }
-
-    group('start button', () {
-      testWidgets("should be active initially", (WidgetTester tester) async {
+    group("title", () {
+      testWidgets("should display the title", (WidgetTester tester) async {
         await buildWidget(tester);
 
-        expectButtonEnabled(tester, 'Start');
+        expect(find.text("Stopwatch"), findsOneWidget);
       });
-
-      testWidgets(
-        "when clicking on it should start the stopwatch and be disabled",
-        (WidgetTester tester) async {
-          await buildWidget(tester);
-
-          Finder finder = find.widgetWithText(FilledButton, 'Start');
-
-          await tester.tap(finder);
-          await tester.pump();
-
-          expect(fakeStopwatchService.startCalls, 1);
-
-          fakeStopwatchService.advance(
-            Duration(milliseconds: elapsedMilliseconds),
-          );
-          await tester.pump(Duration(milliseconds: elapsedMilliseconds));
-
-          expect(find.text("00:00.032"), findsOneWidget);
-
-          expectButtonDisabled(tester, 'Start');
-        },
-      );
     });
 
-    group('pause / resume button', () {
-      testWidgets("should be disabled initially", (WidgetTester tester) async {
+    group("layout", () {
+      testWidgets("should display portrait when the layout is portrait", (
+        WidgetTester tester,
+      ) async {
         await buildWidget(tester);
 
-        expectButtonDisabled(tester, 'Pause');
+        expect(find.byType(StopwatchPortrait), findsOneWidget);
+        expect(find.byType(StopwatchLandscape), findsNothing);
+      });
+
+      testWidgets("should display landscape when the layout is landscape", (
+        WidgetTester tester,
+      ) async {
+        await buildWidget(tester, size: Size(800, 600));
+
+        expect(find.byType(StopwatchLandscape), findsOneWidget);
+        expect(find.byType(StopwatchPortrait), findsNothing);
       });
 
       testWidgets(
-        "when clicking on it should pause the stopwatch and the text should be changed",
+        "should not overflow on a short landscape test with 200% text scale",
         (WidgetTester tester) async {
-          await buildWidget(tester);
+          await buildWidget(tester, size: const Size(640, 380), textScale: 2);
 
-          Finder finder = find.widgetWithText(FilledButton, 'Start');
-
-          await tester.tap(finder);
-          await tester.pump();
-
-          fakeStopwatchService.advance(
-            Duration(milliseconds: elapsedMilliseconds),
-          );
-          await tester.pump(Duration(milliseconds: elapsedMilliseconds));
-
-          expect(find.text("00:00.032"), findsOneWidget);
-
-          expectButtonEnabled(tester, 'Pause');
-
-          finder = find.widgetWithText(FilledButton, 'Pause');
-
-          await tester.tap(finder);
-          await tester.pump();
-
-          expect(fakeStopwatchService.stopCalls, 1);
-
-          await tester.pump(Duration(milliseconds: elapsedMilliseconds));
-
-          expect(find.text("00:00.032"), findsOneWidget);
-
-          expectButtonEnabled(tester, 'Resume');
+          expect(tester.takeException(), isNull);
         },
       );
 
       testWidgets(
-        "when clicking it after pausing it should restart the timer",
+        "should not overflow on a narrow portrait screen at 200% text scale",
         (WidgetTester tester) async {
-          await buildWidget(tester);
+          const int lapCount = 20;
+          final List<Lap> laps = List.generate(lapCount, (int index) {
+            final int number = lapCount - index;
 
-          Finder finder = find.widgetWithText(FilledButton, 'Start');
+            return Lap(
+              number: number,
+              split: const Duration(seconds: 1),
+              total: Duration(seconds: number),
+            );
+          });
 
-          await tester.tap(finder);
-          await tester.pump();
-
-          fakeStopwatchService.advance(
-            Duration(milliseconds: elapsedMilliseconds),
+          await buildWidget(
+            tester,
+            size: const Size(320, 568),
+            textScale: 2,
+            stopwatchState: StopwatchState.initial().copyWith(
+              elapsed: const Duration(seconds: lapCount),
+              status: .paused,
+              laps: laps,
+            ),
           );
-          await tester.pump(Duration(milliseconds: elapsedMilliseconds));
 
-          finder = find.widgetWithText(FilledButton, 'Pause');
-
-          await tester.tap(finder);
-          await tester.pump();
-
-          finder = find.widgetWithText(FilledButton, 'Resume');
-
-          await tester.tap(finder);
-          await tester.pump();
-
-          expect(fakeStopwatchService.startCalls, 2);
-
-          fakeStopwatchService.advance(
-            Duration(milliseconds: elapsedMilliseconds),
-          );
-          await tester.pump(Duration(milliseconds: elapsedMilliseconds));
-
-          expect(find.text("00:00.064"), findsOneWidget);
-        },
-      );
-
-      testWidgets("when clicking it again should change text back and forth", (
-        WidgetTester tester,
-      ) async {
-        await buildWidget(tester);
-
-        Finder finder = find.widgetWithText(FilledButton, 'Start');
-
-        await tester.tap(finder);
-        await tester.pump();
-
-        finder = find.widgetWithText(FilledButton, 'Pause');
-        expect(finder, findsOneWidget);
-
-        await tester.tap(finder);
-        await tester.pump();
-
-        finder = find.widgetWithText(FilledButton, 'Resume');
-        expect(finder, findsOneWidget);
-
-        await tester.tap(finder);
-        await tester.pump();
-
-        finder = find.widgetWithText(FilledButton, 'Pause');
-        expect(finder, findsOneWidget);
-      });
-    });
-
-    group('reset button', () {
-      testWidgets("should be disabled initially", (WidgetTester tester) async {
-        await buildWidget(tester);
-
-        expectButtonDisabled(tester, 'Reset');
-      });
-
-      testWidgets(
-        "when clicking on it should reset the stopwatch and be disabled",
-        (WidgetTester tester) async {
-          await buildWidget(tester);
-
-          Finder finder = find.widgetWithText(FilledButton, 'Start');
-
-          await tester.tap(finder);
-          await tester.pump();
-
-          fakeStopwatchService.advance(
-            Duration(milliseconds: elapsedMilliseconds),
-          );
-          await tester.pump(Duration(milliseconds: elapsedMilliseconds));
-
-          expect(find.text("00:00.032"), findsOneWidget);
-
-          expectButtonEnabled(tester, 'Reset');
-
-          finder = find.widgetWithText(FilledButton, "Reset");
-
-          await tester.tap(finder);
-          await tester.pump();
-
-          expect(fakeStopwatchService.resetCalls, 1);
-
-          expect(find.text("00:00.000"), findsOneWidget);
-
-          expectButtonDisabled(tester, "Reset");
-          expectButtonEnabled(tester, "Start");
-          expectButtonDisabled(tester, "Pause");
+          expect(tester.takeException(), isNull);
         },
       );
     });
-    group('lap button', () {
-      testWidgets("should be disabled when stopwatch has not started yet", (
+
+    group("lifecycle observer", () {
+      testWidgets("onVisible should call notifier's startRefresh", (
         WidgetTester tester,
       ) async {
         await buildWidget(tester);
 
-        expectButtonDisabled(tester, "Lap");
+        clearInteractions(stopwatchNotifier);
+
+        final AppLifecycleObserver observer = tester
+            .widget<AppLifecycleObserver>(find.byType(AppLifecycleObserver));
+
+        observer.onVisible();
+
+        verify(() => stopwatchNotifier.startRefresh()).called(1);
       });
 
-      testWidgets("should be enabled when stopwatch has started", (
+      testWidgets("onHidden should call notifier's stopRefresh", (
         WidgetTester tester,
       ) async {
         await buildWidget(tester);
 
-        Finder finder = find.widgetWithText(FilledButton, "Start");
+        clearInteractions(stopwatchNotifier);
 
-        await tester.tap(finder);
-        await tester.pump();
+        final AppLifecycleObserver observer = tester
+            .widget<AppLifecycleObserver>(find.byType(AppLifecycleObserver));
 
-        expectButtonEnabled(tester, "Lap");
-      });
-      testWidgets("should be disabled when stopwatch is paused", (
-        WidgetTester tester,
-      ) async {
-        await buildWidget(tester);
+        observer.onHidden();
 
-        Finder finder = find.widgetWithText(FilledButton, "Start");
-
-        await tester.tap(finder);
-        await tester.pump();
-
-        expectButtonEnabled(tester, "Lap");
-
-        finder = find.widgetWithText(FilledButton, "Pause");
-
-        await tester.tap(finder);
-        await tester.pump();
-
-        expectButtonDisabled(tester, "Lap");
-      });
-
-      testWidgets("should record a single lap when pressed once", (
-        WidgetTester tester,
-      ) async {
-        await buildWidget(tester);
-
-        Finder finder = find.widgetWithText(FilledButton, "Start");
-
-        await tester.tap(finder);
-        await tester.pump();
-
-        expectButtonEnabled(tester, "Lap");
-
-        fakeStopwatchService.advance(
-          Duration(milliseconds: elapsedMilliseconds),
-        );
-
-        finder = find.widgetWithText(FilledButton, "Lap");
-
-        await tester.tap(finder);
-        await tester.pump();
-
-        expect(find.byType(LapsHeader), findsOneWidget);
-        expect(find.byType(LapRow), findsOneWidget);
-        expect(find.text("1"), findsOneWidget);
-        expect(
-          find.ancestor(
-            of: find.text("00:00.032"),
-            matching: find.byType(LapRow),
-          ),
-          findsNWidgets(2),
-        );
-      });
-
-      testWidgets("should record two laps when pressed twice", (
-        WidgetTester tester,
-      ) async {
-        await buildWidget(tester);
-
-        Finder finder = find.widgetWithText(FilledButton, "Start");
-
-        await tester.tap(finder);
-        await tester.pump();
-
-        expectButtonEnabled(tester, "Lap");
-
-        fakeStopwatchService.advance(
-          Duration(milliseconds: elapsedMilliseconds),
-        );
-
-        finder = find.widgetWithText(FilledButton, "Lap");
-
-        await tester.tap(finder);
-        await tester.pump();
-
-        fakeStopwatchService.advance(
-          Duration(milliseconds: elapsedMilliseconds),
-        );
-
-        await tester.tap(finder);
-        await tester.pump();
-
-        expect(find.byType(LapsHeader), findsOneWidget);
-        expect(find.byType(LapRow), findsNWidgets(2));
-        expect(find.text("1"), findsOneWidget);
-        expect(find.text("2"), findsOneWidget);
-        expect(
-          find.ancestor(
-            of: find.text("00:00.032"),
-            matching: find.byType(LapRow),
-          ),
-          findsNWidgets(3),
-        );
-        expect(
-          find.ancestor(
-            of: find.text("00:00.064"),
-            matching: find.byType(LapRow),
-          ),
-          findsOneWidget,
-        );
+        verify(() => stopwatchNotifier.stopRefresh()).called(1);
       });
     });
 
-    group("Clear laps button", () {
-      testWidgets("should not be present initially", (
-        WidgetTester tester,
-      ) async {
-        await buildWidget(tester);
+    group("session issue", () {
+      group("invalid saved session", () {
+        testWidgets("should display a snackbar with the appropriate text", (
+          WidgetTester tester,
+        ) async {
+          await buildWidget(
+            tester,
+            stopwatchState: StopwatchState.withIssue(.invalidSavedSession),
+          );
 
-        expect(find.widgetWithText(OutlinedButton, "Clear laps"), findsNothing);
+          expect(
+            find.widgetWithText(
+              SnackBar,
+              "We couldn't recover your stopwatch session, so we started a new one.",
+            ),
+            findsOneWidget,
+          );
+        });
+
+        testWidgets("should call notifier's acknowledgeInvalidSavedSession", (
+          WidgetTester tester,
+        ) async {
+          await buildWidget(
+            tester,
+            stopwatchState: StopwatchState.withIssue(.invalidSavedSession),
+          );
+
+          verify(() => stopwatchNotifier.acknowledgeInvalidSavedSession())
+              .called(1);
+        });
       });
 
-      testWidgets("should be present when one lap is recorded", (
-        WidgetTester tester,
-      ) async {
-        await buildWidget(tester);
+      group("save failed", () {
+        testWidgets("should display a snackbar with the appropriate text", (
+          WidgetTester tester,
+        ) async {
+          await buildWidget(
+            tester,
+            stopwatchState: StopwatchState.withIssue(.saveFailed),
+          );
 
-        Finder finder = find.widgetWithText(FilledButton, "Start");
+          expect(
+            find.widgetWithText(
+              SnackBar,
+              "We couldn't save your stopwatch session. Your latest changes may not be restored.",
+            ),
+            findsOneWidget,
+          );
+        });
+      });
 
-        await tester.tap(finder);
-        await tester.pump();
+      group("read failed", () {
+        testWidgets("should display an alert dialog with appropriate content", (
+          WidgetTester tester,
+        ) async {
+          await buildWidget(
+            tester,
+            stopwatchState: StopwatchState.withIssue(.readFailed),
+          );
 
-        fakeStopwatchService.advance(
-          Duration(milliseconds: elapsedMilliseconds),
+          final Finder stopwatchAlertDialogFinder = find.byType(
+            StopwatchAlertDialog,
+          );
+
+          expect(stopwatchAlertDialogFinder, findsOneWidget);
+
+          expect(
+            find.descendant(
+              of: stopwatchAlertDialogFinder,
+              matching: find.text("Read error"),
+            ),
+            findsOneWidget,
+          );
+          expect(
+            find.descendant(
+              of: stopwatchAlertDialogFinder,
+              matching: find.text(
+                "We couldn't read your stopwatch session. Please try again or discard it.",
+              ),
+            ),
+            findsOneWidget,
+          );
+          expect(
+            find.descendant(
+              of: stopwatchAlertDialogFinder,
+              matching: find.widgetWithText(TextButton, "Discard"),
+            ),
+            findsOneWidget,
+          );
+          expect(
+            find.descendant(
+              of: stopwatchAlertDialogFinder,
+              matching: find.widgetWithText(TextButton, "Try again"),
+            ),
+            findsOneWidget,
+          );
+        });
+
+        testWidgets(
+          "alert's discard should call notifier's clear saved session",
+          (WidgetTester tester) async {
+            await buildWidget(
+              tester,
+              stopwatchState: StopwatchState.withIssue(.readFailed),
+            );
+
+            when(() => stopwatchNotifier.clearSavedSession())
+                .thenAnswer((_) async {});
+
+            await tester.tap(
+              find.descendant(
+                of: find.byType(StopwatchAlertDialog),
+                matching: find.widgetWithText(TextButton, "Discard"),
+              ),
+            );
+
+            verify(() => stopwatchNotifier.clearSavedSession()).called(1);
+          },
         );
 
-        finder = find.widgetWithText(FilledButton, "Lap");
+        testWidgets(
+          "alert's try again should call notifier's retry session restore",
+          (WidgetTester tester) async {
+            await buildWidget(
+              tester,
+              stopwatchState: StopwatchState.withIssue(.readFailed),
+            );
 
-        await tester.tap(finder);
-        await tester.pump();
+            when(() => stopwatchNotifier.retrySessionRestore())
+                .thenAnswer((_) async {});
 
-        expect(
-          find.widgetWithText(OutlinedButton, "Clear laps"),
-          findsOneWidget,
+            await tester.tap(
+              find.descendant(
+                of: find.byType(StopwatchAlertDialog),
+                matching: find.widgetWithText(TextButton, "Try again"),
+              ),
+            );
+
+            verify(() => stopwatchNotifier.retrySessionRestore()).called(1);
+          },
         );
       });
 
-      testWidgets("should disappear along with the laps when pressed", (
-        WidgetTester tester,
-      ) async {
-        await buildWidget(tester);
+      group("clear failed", () {
+        testWidgets("should display an alert dialog with appropriate content", (
+          WidgetTester tester,
+        ) async {
+          await buildWidget(
+            tester,
+            stopwatchState: StopwatchState.withIssue(.clearFailed),
+          );
 
-        Finder finder = find.widgetWithText(FilledButton, "Start");
+          final Finder stopwatchAlertDialogFinder = find.byType(
+            StopwatchAlertDialog,
+          );
 
-        await tester.tap(finder);
-        await tester.pump();
+          expect(stopwatchAlertDialogFinder, findsOneWidget);
 
-        fakeStopwatchService.advance(
-          Duration(milliseconds: elapsedMilliseconds),
+          expect(
+            find.descendant(
+              of: stopwatchAlertDialogFinder,
+              matching: find.text("Clear error"),
+            ),
+            findsOneWidget,
+          );
+          expect(
+            find.descendant(
+              of: stopwatchAlertDialogFinder,
+              matching: find.text(
+                "We couldn't clear your stopwatch session. Please try again.",
+              ),
+            ),
+            findsOneWidget,
+          );
+          expect(
+            find.descendant(
+              of: stopwatchAlertDialogFinder,
+              matching: find.widgetWithText(TextButton, "Try again"),
+            ),
+            findsOneWidget,
+          );
+        });
+
+        testWidgets(
+          "alert's try again should call notifier's clear saved session",
+          (WidgetTester tester) async {
+            await buildWidget(
+              tester,
+              stopwatchState: StopwatchState.withIssue(.clearFailed),
+            );
+
+            when(() => stopwatchNotifier.clearSavedSession())
+                .thenAnswer((_) async {});
+
+            await tester.tap(
+              find.descendant(
+                of: find.byType(StopwatchAlertDialog),
+                matching: find.widgetWithText(TextButton, "Try again"),
+              ),
+            );
+
+            verify(() => stopwatchNotifier.clearSavedSession()).called(1);
+          },
         );
-
-        finder = find.widgetWithText(FilledButton, "Lap");
-
-        await tester.tap(finder);
-        await tester.pump();
-
-        expect(find.byType(LapRow), findsOneWidget);
-
-        finder = find.widgetWithText(OutlinedButton, "Clear laps");
-
-        await tester.tap(finder);
-        await tester.pump();
-
-        expect(find.byType(LapRow), findsNothing);
-        expect(find.widgetWithText(OutlinedButton, "Clear laps"), findsNothing);
-        expect(find.byType(LapsHeader), findsNothing);
       });
     });
   });

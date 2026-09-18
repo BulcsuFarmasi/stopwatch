@@ -1,12 +1,11 @@
 {
-    "name": "stopwatch",
-    "short_name": "stopwatch",
+    "name": "Stopwatch",
+    "short_name": "Stopwatch",
     "start_url": ".",
     "display": "standalone",
-    "background_color": "#0175C2",
-    "theme_color": "#0175C2",
+    "background_color": "#004D43",
+    "theme_color": "#004D43",
     "description": "A Stopwatch app.",
-    "orientation": "portrait-primary",
     "prefer_related_applications": false,
     "icons": [
         {

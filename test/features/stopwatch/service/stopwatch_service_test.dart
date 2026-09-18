@@ -9,64 +9,87 @@ void main() {
       stopwatchService = StopwatchService();
     });
 
-    test(
-      "start should start the stopwatch and the elapsed time should grow",
-      () async {
+    group("restoreElapsed", () {
+      test("should add the given duration to the stopwatch time", () async {
         expect(stopwatchService.elapsedTime, Duration.zero);
 
-        stopwatchService.start();
+        const int elapsedMilliseconds = 32;
 
-        await Future.delayed(Duration(milliseconds: elapsedMilliseconds));
-
-        expect(stopwatchService.elapsedTime, greaterThan(Duration.zero));
-
-        stopwatchService.stop();
-      },
-    );
-
-    test(
-      "stop should pause the stopwatch and the elapsed time should freeze",
-      () async {
-        expect(stopwatchService.elapsedTime, Duration.zero);
-
-        stopwatchService.start();
-
-        await Future.delayed(Duration(milliseconds: elapsedMilliseconds));
-
-        expect(stopwatchService.elapsedTime, greaterThan(Duration.zero));
-
-        stopwatchService.stop();
-
-        final Duration elapsedTime = stopwatchService.elapsedTime;
-
-        await Future.delayed(Duration(milliseconds: elapsedMilliseconds));
-
-        expect(elapsedTime, stopwatchService.elapsedTime);
-      },
-    );
-
-    test(
-      "reset should reset the stopwatch and the elapsed time should reset",
-      () async {
-        expect(stopwatchService.elapsedTime, Duration.zero);
-
-        stopwatchService.start();
-
-        await Future.delayed(Duration(milliseconds: elapsedMilliseconds));
-
-        expect(stopwatchService.elapsedTime, greaterThan(Duration.zero));
-
-        stopwatchService.reset();
-
-        expect(stopwatchService.elapsedTime, Duration.zero);
-        await Future<void>.delayed(
-          const Duration(milliseconds: elapsedMilliseconds),
+        stopwatchService.restoreElapsed(
+          Duration(milliseconds: elapsedMilliseconds),
         );
 
-        expect(stopwatchService.elapsedTime, Duration.zero);
+        expect(
+          stopwatchService.elapsedTime,
+          Duration(milliseconds: elapsedMilliseconds),
+        );
+      });
+    });
 
-        stopwatchService.stop();
-      },
-    );
+    group("start", () {
+      test(
+        "should start the stopwatch and the elapsed time should grow",
+        () async {
+          expect(stopwatchService.elapsedTime, Duration.zero);
+
+          stopwatchService.start();
+
+          await Future.delayed(Duration(milliseconds: elapsedMilliseconds));
+
+          expect(stopwatchService.elapsedTime, greaterThan(Duration.zero));
+
+          stopwatchService.stop();
+        },
+      );
+    });
+
+    group("stop", () {
+      test(
+        "should pause the stopwatch and the elapsed time should freeze",
+        () async {
+          expect(stopwatchService.elapsedTime, Duration.zero);
+
+          stopwatchService.start();
+
+          await Future.delayed(Duration(milliseconds: elapsedMilliseconds));
+
+          expect(stopwatchService.elapsedTime, greaterThan(Duration.zero));
+
+          stopwatchService.stop();
+
+          final Duration elapsedTime = stopwatchService.elapsedTime;
+
+          await Future.delayed(Duration(milliseconds: elapsedMilliseconds));
+
+          expect(elapsedTime, stopwatchService.elapsedTime);
+        },
+      );
+    });
+
+    group("reset", () {
+      test(
+        "should reset the stopwatch and the elapsed time should reset",
+        () async {
+          expect(stopwatchService.elapsedTime, Duration.zero);
+
+          stopwatchService.start();
+
+          await Future.delayed(Duration(milliseconds: elapsedMilliseconds));
+
+          expect(stopwatchService.elapsedTime, greaterThan(Duration.zero));
+
+          stopwatchService.reset();
+
+          expect(stopwatchService.elapsedTime, Duration.zero);
+          await Future<void>.delayed(
+            const Duration(milliseconds: elapsedMilliseconds),
+          );
+
+          expect(stopwatchService.elapsedTime, Duration.zero);
+
+          stopwatchService.stop();
+        },
+      );
+    });
   });
 }

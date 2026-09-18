@@ -1,0 +1,14 @@
+flutter_launcher_icons:
+  android: true
+  ios: true
+  image_path: assets/images/stopwatch_launcher.png
+  adaptive_icon_background: "#004D43"
+  adaptive_icon_foreground: assets/images/stopwatch_foreground.png
+  adaptive_icon_monochrome: assets/images/stopwatch_foreground.png
+  remove_alpha_ios: true
+  background_color_ios: "#004D43"
+  web:
+    generate: true
+    image_path: assets/images/stopwatch_launcher.png
+    background_color: "#004D43"
+    theme_color: "#004D43"
