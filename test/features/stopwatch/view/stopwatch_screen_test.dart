@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:stopwatch/features/stopwatch/logic/stopwatch_notifier.dart';
+import 'package:stopwatch/features/stopwatch/model/lap.dart';
 import 'package:stopwatch/features/stopwatch/view/stopwatch_screen.dart';
 import 'package:stopwatch/features/stopwatch/view/widgets/layout/stopwatch_landscape.dart';
 import 'package:stopwatch/features/stopwatch/view/widgets/layout/stopwatch_portrait.dart';
@@ -19,6 +20,7 @@ void main() {
       WidgetTester tester, {
       StopwatchState? stopwatchState,
       Size size = const Size(600, 800),
+      double textScale = 1,
     }) async {
       tester.view.devicePixelRatio = 1;
       tester.view.physicalSize = size;
@@ -38,9 +40,19 @@ void main() {
           overrides: [
             stopwatchNotifierProvider.overrideWith(() => stopwatchNotifier),
           ],
-          child: MaterialApp(home: StopwatchScreen()),
+          child: MaterialApp(
+            builder: (BuildContext context, Widget? child) {
+              return MediaQuery(
+                data: MediaQuery.of(context)
+                    .copyWith(textScaler: TextScaler.linear(textScale)),
+                child: child!,
+              );
+            },
+            home: StopwatchScreen(),
+          ),
         ),
       );
+
       await tester.pump();
     }
 
@@ -70,6 +82,44 @@ void main() {
         expect(find.byType(StopwatchLandscape), findsOneWidget);
         expect(find.byType(StopwatchPortrait), findsNothing);
       });
+
+      testWidgets(
+        "should not overflow on a short landscape test with 200% text scale",
+        (WidgetTester tester) async {
+          await buildWidget(tester, size: const Size(640, 380), textScale: 2);
+
+          expect(tester.takeException(), isNull);
+        },
+      );
+
+      testWidgets(
+        "should not overflow on a narrow portrait screen at 200% text scale",
+        (WidgetTester tester) async {
+          const int lapCount = 20;
+          final List<Lap> laps = List.generate(lapCount, (int index) {
+            final int number = lapCount - index;
+
+            return Lap(
+              number: number,
+              split: const Duration(seconds: 1),
+              total: Duration(seconds: number),
+            );
+          });
+
+          await buildWidget(
+            tester,
+            size: const Size(320, 568),
+            textScale: 2,
+            stopwatchState: StopwatchState.initial().copyWith(
+              elapsed: const Duration(seconds: lapCount),
+              status: .paused,
+              laps: laps,
+            ),
+          );
+
+          expect(tester.takeException(), isNull);
+        },
+      );
     });
 
     group("lifecycle observer", () {

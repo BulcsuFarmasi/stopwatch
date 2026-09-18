@@ -10,7 +10,9 @@ import 'package:stopwatch/features/stopwatch/view/widgets/display/digital_clock.
 import 'package:stopwatch/l10n/app_strings.dart';
 
 class StopwatchDisplay extends StatelessWidget {
-  const new({super.key});
+  const new({super.key, this.digitalOnly = false});
+
+  final bool digitalOnly;
 
   @override
   Widget build(BuildContext context) {
@@ -31,43 +33,50 @@ class StopwatchDisplay extends StatelessWidget {
             final double scale =
                 diameter / StopwatchConstants.analogClockBaseDiameter;
 
-            return Center(
-              child: SizedBox.square(
-                dimension: diameter,
-                child: Consumer(
-                  builder: (BuildContext context, WidgetRef ref, _) {
-                    final Duration elapsed = ref.watch(
-                      stopwatchNotifierProvider.select(
-                        (AsyncValue<StopwatchState> state) =>
-                            state.value?.elapsed ?? Duration.zero,
-                      ),
-                    );
+            return Consumer(
+              builder: (BuildContext context, WidgetRef ref, _) {
+                final Duration elapsed = ref.watch(
+                  stopwatchNotifierProvider.select(
+                    (AsyncValue<StopwatchState> state) =>
+                        state.value?.elapsed ?? Duration.zero,
+                  ),
+                );
 
-                    final DurationParts elapsedParts = splitDuration(elapsed);
+                final DurationParts elapsedParts = splitDuration(elapsed);
 
-                    return Semantics(
-                      container: true,
-                      excludeSemantics: true,
-                      liveRegion: false,
-                      label:
-                          "${AppStrings.elapsedTime} ${AppStrings.durationSemantics(minutes: elapsedParts.minutes, seconds: elapsedParts.seconds, milliseconds: elapsedParts.milliseconds)}",
-                      child: Stack(
-                        alignment: Alignment.center,
-                        children: [
-                          Positioned(
-                            bottom:
-                                diameter *
-                                StopwatchConstants
-                                    .digitalClockBottomOffsetRatio,
-                            child: DigitalClock(elapsed: elapsed, scale: scale),
+                final Widget display = digitalOnly
+                    ? Center(child: DigitalClock(elapsed: elapsed, scale: 1))
+                    : Center(
+                        child: SizedBox.square(
+                          dimension: diameter,
+                          child: Stack(
+                            alignment: Alignment.center,
+                            children: [
+                              Positioned(
+                                bottom:
+                                    diameter *
+                                    StopwatchConstants
+                                        .digitalClockBottomOffsetRatio,
+                                child: DigitalClock(
+                                  elapsed: elapsed,
+                                  scale: scale,
+                                ),
+                              ),
+                              AnalogClock(elapsed: elapsed),
+                            ],
                           ),
-                          AnalogClock(elapsed: elapsed),
-                        ],
-                      ),
-                    );
-                  },
-                ),
-              ),
+                        ),
+                      );
+
+                return Semantics(
+                  container: true,
+                  excludeSemantics: true,
+                  liveRegion: false,
+                  label:
+                      "${AppStrings.elapsedTime} ${AppStrings.durationSemantics(minutes: elapsedParts.minutes, seconds: elapsedParts.seconds, milliseconds: elapsedParts.milliseconds)}",
+                  child: display,
+                );
+              },
             );
           },
         ),

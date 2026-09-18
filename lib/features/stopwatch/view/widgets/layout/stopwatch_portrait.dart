@@ -11,8 +11,22 @@ class StopwatchPortrait extends StatelessWidget {
   Widget build(BuildContext context) {
     return LayoutBuilder(
       builder: (BuildContext context, BoxConstraints constraints) {
+        final baseFontHeight =
+            Theme.of(context).textTheme.bodyMedium?.fontSize ?? 18;
+
+        final double scaledFontSize = MediaQuery.textScalerOf(context)
+            .scale(baseFontHeight);
+
+        final bool usesLargeText =
+            scaledFontSize >=
+            baseFontHeight * StopwatchConstants.largeTextScaleThreshold;
+
         final bool compactHeight =
-            constraints.maxHeight < StopwatchConstants.compactHeightBreakpoint;
+            constraints.maxHeight <
+                StopwatchConstants.compactHeightBreakpoint ||
+            usesLargeText &&
+                constraints.maxHeight <
+                    StopwatchConstants.largeTextCompactHeightBreakpoint;
 
         return Center(
           child: ConstrainedBox(
@@ -29,7 +43,13 @@ class StopwatchPortrait extends StatelessWidget {
                     ? StopwatchConstants.compactSpacing
                     : StopwatchConstants.baseSpacing,
                 children: [
-                  Flexible(child: StopwatchDisplay()),
+                  if (compactHeight)
+                    SizedBox(
+                      height: StopwatchConstants.compactDisplayHeight,
+                      child: StopwatchDisplay(digitalOnly: true),
+                    )
+                  else
+                    Flexible(child: StopwatchDisplay()),
                   Expanded(child: StopwatchLaps()),
                   StopwatchControls(useCompactLayout: compactHeight),
                 ],

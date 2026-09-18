@@ -5,6 +5,9 @@ class StopwatchConstants {
   static const double compactSpacing = 12;
   static const double compactPadding = 12;
   static const double compactHeightBreakpoint = 500;
+  static const double largeTextScaleThreshold = 1.5;
+  static const double largeTextCompactHeightBreakpoint = 600;
+  static const double compactDisplayHeight = 64;
 
   static const double analogClockDiameterRatio = 0.6;
   static const double analogClockBaseDiameter =

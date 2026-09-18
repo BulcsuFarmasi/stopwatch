@@ -31,18 +31,20 @@ class StopwatchControls extends StatelessWidget {
         final bool landscape = MediaQuery.orientationOf(context) == .landscape;
 
         if (landscape) {
-          return Column(
-            key: landscapeKey,
-            mainAxisSize: MainAxisSize.min,
-            mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            spacing: StopwatchConstants.compactSpacing / 2,
-            children: [
-              StartButton(),
-              PauseResumeButton(),
-              ResetButton(),
-              LapButton(),
-            ],
+          return SingleChildScrollView(
+            child: Column(
+              key: landscapeKey,
+              mainAxisSize: MainAxisSize.min,
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              spacing: StopwatchConstants.compactSpacing / 2,
+              children: [
+                StartButton(),
+                PauseResumeButton(),
+                ResetButton(),
+                LapButton(),
+              ],
+            ),
           );
         }
 

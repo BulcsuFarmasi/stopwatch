@@ -277,6 +277,66 @@ void main() {
         expect(state.status, StopwatchStatus.paused);
         expect(state.sessionIssue, isNull);
       });
+
+      test(
+        "does not access state when a save completes after disposal",
+        () async {
+          await setUpTest();
+
+          final Completer<void> saveCompleter = Completer<void>();
+          final List<Object> uncaughtErrors = [];
+
+          when(() => stopwatchSessionCoordinator.save(any()))
+              .thenAnswer((_) => saveCompleter.future);
+
+          await runZonedGuarded(
+            () async {
+              stopwatchNotifier.start();
+
+              container.dispose();
+
+              saveCompleter.complete();
+
+              await Future<void>.delayed(Duration.zero);
+            },
+            (Object error, StackTrace stackTrace) {
+              uncaughtErrors.add(error);
+            },
+          );
+
+          expect(uncaughtErrors, isEmpty);
+        },
+      );
+
+      test("does not access state when a save fails after disposal", () async {
+        await setUpTest();
+
+        final Completer<void> saveGate = Completer<void>();
+        final List<Object> uncaughtErrors = [];
+
+        when(() => stopwatchSessionCoordinator.save(any()))
+            .thenAnswer((_) async {
+              await saveGate.future;
+              throw SessionIssue.saveFailed;
+            });
+
+        await runZonedGuarded(
+          () async {
+            stopwatchNotifier.start();
+            container.dispose();
+
+            saveGate.complete();
+
+            // Allow the save failure and notifier continuation to execute.
+            await Future<void>.delayed(Duration.zero);
+          },
+          (Object error, StackTrace stackTrace) {
+            uncaughtErrors.add(error);
+          },
+        );
+
+        expect(uncaughtErrors, isEmpty);
+      });
     });
 
     group('startRefresh', () {
@@ -628,6 +688,41 @@ void main() {
         expect(state.sessionIssue, SessionIssue.readFailed);
         expect(state.isSessionOperationInProgress, isFalse);
       });
+
+      test(
+        "does not restore state when disposed while retrying restoration",
+        () async {
+          await setUpTest(sessionIssue: SessionIssue.readFailed);
+
+          final Completer<StopwatchSession?> restoreCompleter =
+              Completer<StopwatchSession?>();
+
+          when(() => stopwatchSessionCoordinator.restore())
+              .thenAnswer((_) => restoreCompleter.future);
+
+          final Future<void> retrying = stopwatchNotifier.retrySessionRestore();
+
+          container.dispose();
+
+          restoreCompleter.complete(
+            StopwatchSession(
+              elapsed: const Duration(milliseconds: elapsedMilliseconds),
+              status: StopwatchStatus.running,
+              laps: [],
+            ),
+          );
+
+          await expectLater(retrying, completes);
+
+          verifyNever(
+            () => stopwatchService.restoreElapsed(
+              const Duration(milliseconds: elapsedMilliseconds),
+            ),
+          );
+          verifyNever(() => stopwatchService.start());
+          verifyNever(() => stopwatchRefreshScheduler.startTimer(any()));
+        },
+      );
     });
 
     group("clearSavedSession", () {
@@ -709,9 +804,28 @@ void main() {
           isFalse,
         );
       });
+
+      test(
+        "completes safely when disposed while clearing the saved session",
+        () async {
+          await setUpTest(sessionIssue: SessionIssue.readFailed);
+
+          final Completer<void> clearCompleter = Completer<void>();
+
+          when(() => stopwatchSessionCoordinator.clear())
+              .thenAnswer((_) => clearCompleter.future);
+
+          final Future<void> clearing = stopwatchNotifier.clearSavedSession();
+
+          container.dispose();
+          clearCompleter.complete();
+
+          await expectLater(clearing, completes);
+        },
+      );
     });
 
-    group("clearSavedSession", () {
+    group("acknowledgeInvalidSavedSession", () {
       test('acknowledging an invalid session clears its issue', () async {
         await setUpTest(sessionIssue: SessionIssue.invalidSavedSession);
 

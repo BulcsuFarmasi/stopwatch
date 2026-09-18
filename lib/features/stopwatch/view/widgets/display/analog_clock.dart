@@ -12,7 +12,9 @@ class AnalogClock extends StatelessWidget {
     return Stack(
       fit: StackFit.expand,
       children: [
-        CustomPaint(painter: const AnalogClockFacePainter()),
+        RepaintBoundary(
+          child: CustomPaint(painter: const AnalogClockFacePainter()),
+        ),
         CustomPaint(painter: AnalogClockHandsPainter(elapsed: elapsed)),
       ],
     );

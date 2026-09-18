@@ -6,7 +6,6 @@
     "background_color": "#004D43",
     "theme_color": "#004D43",
     "description": "A Stopwatch app.",
-    "orientation": "portrait-primary",
     "prefer_related_applications": false,
     "icons": [
         {

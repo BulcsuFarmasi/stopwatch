@@ -214,6 +214,34 @@ void main() {
           expect(stopwatchSession.elapsed, Duration(minutes: 10));
         },
       );
+
+      test(
+        "should limit an implausibly large forward clock difference",
+        () async {
+          when(() => stopwatchSessionRepository.load()).thenAnswer(
+            (_) async => StoredStopwatchSession(
+              elapsed: const Duration(minutes: 10),
+              savedAtUtc: DateTime.utc(2025, 9, 12),
+              status: StopwatchStatus.running,
+              laps: [
+                Lap(
+                  number: 1,
+                  split: Duration(milliseconds: 50),
+                  total: Duration(milliseconds: 50),
+                ),
+              ],
+            ),
+          );
+
+          final StopwatchSession stopwatchSession =
+              (await stopwatchSessionCoordinator.restore())!;
+
+          expect(
+            stopwatchSession.elapsed,
+            const Duration(days: 180, minutes: 10),
+          );
+        },
+      );
     });
 
     group("save", () {

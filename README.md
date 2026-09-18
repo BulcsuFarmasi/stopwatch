@@ -66,9 +66,9 @@ Session data is saved after meaningful user actions instead of on every
 
 When the app is backgrounded, display refreshes stop to avoid unnecessary work.
 When it becomes visible again, the display is refreshed immediately. If the
-process was terminated while the stopwatch was running, restoration adds the
-non-negative wall-clock difference since the last meaningful save. Paused
-sessions restore their exact stored duration.
+process was terminated while the stopwatch was running, restoration adds a
+bounded, non-negative wall-clock difference since the last meaningful save.
+Paused sessions restore their exact stored duration.
 
 Storage operations are queued to prevent overlapping save and clear operations.
 Saved JSON is validated before it reaches application state. The current schema
@@ -96,16 +96,22 @@ that implies the persisted data was successfully removed.
 
 Running-session recovery necessarily uses wall-clock time because Dart's
 monotonic `Stopwatch` cannot survive process termination. A backward clock
-change is clamped to a zero delta.
+change contributes no additional elapsed time. A forward recovery gap is capped
+at 180 days to prevent an accidental or manual device-clock change from adding
+years to a restored session. This is a bounded recovery policy, not clock-change
+detection: the app cannot distinguish a genuine long-running session from an
+incorrect wall clock after process termination.
 
 ## Responsive design
 
 Portrait is the primary mobile layout. Landscape arranges the display, laps,
 and controls horizontally, with the controls stacked to preserve space for the
-clock and lap values. Compact portrait layouts use two control rows. The clock
-and digital readout scale from their available constraints, while lap entries
-scroll lazily through `ListView.separated`. The lap header and Clear laps button
-remain fixed around the scrolling list.
+clock and lap values; the control column becomes scrollable when enlarged text
+cannot fit on a short landscape screen. Compact portrait layouts use two control
+rows. On short portrait screens with enlarged text, the decorative analog clock
+is omitted while the digital elapsed time remains visible, leaving enough space
+for the fixed lap header and Clear laps button. Lap entries continue to scroll
+lazily through `ListView.separated`.
 
 ## Accessibility and localization
 
@@ -123,6 +129,13 @@ this would be replaced with Flutter's generated ARB localization using `intl`
 and `flutter_localizations`. A translation-management platform such as Crowdin,
 Lokalise, or Phrase could synchronize ARB files for a larger product and team.
 
+## Third-party assets
+
+Roboto Condensed Light and Medium were downloaded from Google Fonts. The
+bundled font metadata identifies version 3.008 and licensing under the Apache
+License 2.0. The full license text is included at
+`assets/fonts/roboto_condensed/LICENSE.txt`.
+
 ## Performance
 
 - Riverpod `select` limits elapsed-time rebuilds to the stopwatch display.
@@ -131,9 +144,10 @@ Lokalise, or Phrase could synchronize ARB files for a larger product and team.
 - Refresh scheduling stops while the app is not visible.
 - `SharedPreferences` writes occur only on meaningful state changes.
 
-Flutter DevTools rebuild tracing and repaint visualization were used to verify
-the update scope. Profile-mode testing on a physical OnePlus 12R averaged about
-119 FPS against its 120 Hz target without persistent jank.
+Flutter DevTools rebuild tracing and repaint visualization were used during
+manual validation to inspect the update scope. Profile-mode testing on a
+physical OnePlus 12R did not reveal persistent jank during normal stopwatch
+use. These checks were manual, and no benchmark trace is committed.
 
 ## Security considerations
 
@@ -163,7 +177,7 @@ translated into `SessionIssue` values.
 The repository pins Flutter through FVM:
 
 - Flutter 3.47.1
-- Dart 3.13.0
+- Dart 3.13.1
 
 Install dependencies and run the application:
 
@@ -196,7 +210,7 @@ Create a web build:
 fvm flutter build web
 ```
 
-The latest recorded full unit/widget run completed 194 tests with 97.4% line
+The latest recorded full unit/widget run completed 203 tests with 97.4% line
 coverage. The integration journey covers clean launch, start, elapsed-time
 progression, lap recording, pause, resume, and reset using production
 dependencies and persistent storage.

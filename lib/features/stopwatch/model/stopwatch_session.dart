@@ -6,5 +6,6 @@ class StopwatchSession {
   final StopwatchStatus status;
   final List<Lap> laps;
 
-  new({required this.elapsed, required this.status, required this.laps});
+  new({required this.elapsed, required this.status, required List<Lap> laps})
+    : laps = List<Lap>.unmodifiable(laps);
 }

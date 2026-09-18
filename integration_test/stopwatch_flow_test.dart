@@ -65,18 +65,16 @@ void main() {
     expect(find.byType(LapRow), findsNothing);
     expect(findButton("Start"), findsOneWidget);
   });
+}
 
-  
-  }
+Finder findButton(String label) => find.widgetWithText(FilledButton, label);
 
-  Finder findButton(String label) => find.widgetWithText(FilledButton, label);
+Duration getElapsedTime(WidgetTester tester) =>
+    tester.widget<DigitalClock>(find.byType(DigitalClock)).elapsed;
 
-  Duration getElapsedTime(WidgetTester tester) =>
-      tester.widget<DigitalClock>(find.byType(DigitalClock)).elapsed;
-
-  Future<void> waitForRealTime(WidgetTester tester) async {
-    await tester.runAsync(
-      () => Future<void>.delayed(const Duration(milliseconds: 320)),
-    );
-    await tester.pump();
+Future<void> waitForRealTime(WidgetTester tester) async {
+  await tester.runAsync(
+    () => Future<void>.delayed(const Duration(milliseconds: 320)),
+  );
+  await tester.pump();
 }

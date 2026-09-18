@@ -127,7 +127,13 @@ class StopwatchNotifier extends AsyncNotifier<StopwatchState> {
       final current = state.requireValue;
       state = AsyncValue.data(current.copyWith(sessionIssue: null));
 
-      state = AsyncValue.data(await _restore() ?? .initial());
+      final StopwatchState? restoredState = await _restore();
+
+      if (!ref.mounted) {
+        return;
+      }
+
+      state = AsyncValue.data(restoredState ?? .initial());
     });
   }
 
@@ -138,8 +144,14 @@ class StopwatchNotifier extends AsyncNotifier<StopwatchState> {
       state = AsyncValue.data(current.copyWith(sessionIssue: null));
       try {
         await _stopwatchSessionCoordinator.clear();
+        if (!ref.mounted) {
+          return;
+        }
         state = AsyncValue.data(.initial());
       } on SessionIssue catch (issue) {
+        if (!ref.mounted) {
+          return;
+        }
         state = AsyncValue.data(.withIssue(issue));
       }
     });
@@ -168,11 +180,18 @@ class StopwatchNotifier extends AsyncNotifier<StopwatchState> {
     try {
       await _stopwatchSessionCoordinator.save(session);
 
+      if (!ref.mounted) {
+        return;
+      }
+
       final StopwatchState? current = state.value;
       if (current?.sessionIssue == .saveFailed) {
         state = AsyncValue.data(current!.copyWith(sessionIssue: null));
       }
     } on SessionIssue catch (issue) {
+      if (!ref.mounted) {
+        return;
+      }
       final StopwatchState? current = state.value;
       if (current != null) {
         state = AsyncValue.data(current.copyWith(sessionIssue: issue));
@@ -184,6 +203,10 @@ class StopwatchNotifier extends AsyncNotifier<StopwatchState> {
     try {
       final StopwatchSession? session = await _stopwatchSessionCoordinator
           .restore();
+
+      if (!ref.mounted) {
+        return null;
+      }
 
       if (session == null) {
         return null;
@@ -230,12 +253,14 @@ class StopwatchNotifier extends AsyncNotifier<StopwatchState> {
     try {
       await operation();
     } finally {
-      final StopwatchState? current = state.value;
+      if (ref.mounted) {
+        final StopwatchState? current = state.value;
 
-      if (current != null) {
-        state = AsyncValue.data(
-          current.copyWith(isSessionOperationInProgress: false),
-        );
+        if (current != null) {
+          state = AsyncValue.data(
+            current.copyWith(isSessionOperationInProgress: false),
+          );
+        }
       }
     }
   }

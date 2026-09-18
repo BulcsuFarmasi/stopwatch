@@ -16,6 +16,11 @@ class StopwatchSessionCoordinator {
   final StopwatchSessionRepository _stopwatchSessionRepository;
   final DateTime Function() _currentTime;
 
+  // Bounds restoration errors caused by large forward device-clock changes.
+  // Duration uses fixed days, so this represents 180 days rather than calendar
+  // months.
+  static const Duration _maximumRestorationGap = Duration(days: 180);
+
   new({
     required this._stopwatchSessionRepository,
     DateTime Function()? currentTime,
@@ -33,7 +38,7 @@ class StopwatchSessionCoordinator {
 
       final Duration restoredElapsed = switch (session.status) {
         .running =>
-          session.elapsed + _nonNegativeDifference(nowUtc, session.savedAtUtc),
+          session.elapsed + _clampDifference(nowUtc, session.savedAtUtc),
         .paused => session.elapsed,
         _ => Duration.zero,
       };
@@ -67,8 +72,13 @@ class StopwatchSessionCoordinator {
     await _stopwatchSessionRepository.clear();
   }
 
-  Duration _nonNegativeDifference(DateTime later, DateTime earlier) {
+  Duration _clampDifference(DateTime later, DateTime earlier) {
     final Duration difference = later.difference(earlier);
+
+    if (difference > _maximumRestorationGap) {
+      return _maximumRestorationGap;
+    }
+
     return difference.isNegative ? Duration.zero : difference;
   }
 }
